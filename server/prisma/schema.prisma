@@ -56,33 +56,33 @@ model User {
   email         String         @unique
   phoneNumber   String?
   status        UserStatus     @default(ACTIVE)
-  role          UserRole       // Role is now a simple field in the User table
-  malls         Mall[]         // One user can have many malls (optional)
-  bids          Bid[]          // One user can have many bids
+  role          UserRole // Role is now a simple field in the User table
+  malls         Mall[] // One user can have many malls (optional)
+  bids          Bid[] // One user can have many bids
   notifications Notification[] // One user can have many notifications
-  profile       Profile?       // One-to-one relationship with Profile
-  rents         Rent[]         // One user can rent many rooms
-  posts         Post[]         // One user can create many posts
-  winner        Winner[]       // One user can win many bids
-  deposit       Deposit[]     
+  profile       Profile? // One-to-one relationship with Profile
+  rents         Rent[] // One user can rent many rooms
+  posts         Post[] // One user can create many posts
+  winner        Winner[] // One user can win many bids
+  deposit       Deposit[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  
+
   @@index([email]) // Add index on the email field
   @@index([username]) // Add index on the username field
 }
 
 model Mall {
-  id          Int      @id @default(autoincrement())
-  mallName    String   @unique // Ensure mall names are unique
-  location    String   // Add @required if location is mandatory
+  id          Int         @id @default(autoincrement())
+  mallName    String      @unique // Ensure mall names are unique
+  location    String // Add @required if location is mandatory
   description String?
   totalFloors Int
   totalRooms  Int
   userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user        User        @relation(fields: [userId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   rooms       Rooms[]
   floors      Floor[]
   agreements  Agreement[]
@@ -93,7 +93,7 @@ model Post {
   id          Int         @id @default(autoincrement())
   mallId      Int
   roomId      Int
-  title       String      // Add @required if title is mandatory
+  title       String // Add @required if title is mandatory
   description String?
   price       Float?
   bidDeposit  Float?
@@ -112,23 +112,23 @@ model Post {
 }
 
 model PostImage {
-  id       Int     @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   postId   Int
   imageURL String
-  post     Post    @relation(fields: [postId], references: [id])
+  post     Post   @relation(fields: [postId], references: [id])
 }
 
 model Bid {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
   postId    Int
   bidAmount Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  post      Post      @relation(fields: [postId], references: [id])
   deposits  Deposit[] // One bid can have many deposits
-  winner    Winner?   // One bid can have one winner
+  winner    Winner? // One bid can have one winner
 
   @@index([userId]) // Add index on the userId field
   @@index([postId]) // Add index on the postId field
@@ -137,7 +137,7 @@ model Bid {
 model Deposit {
   id        Int      @id @default(autoincrement())
   bidId     Int
-  userId    Int      // Deposit is made by a user
+  userId    Int // Deposit is made by a user
   amount    Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -157,14 +157,14 @@ model Winner {
 }
 
 model Notification {
-  id        Int              @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   userId    Int
   message   String
   type      NotificationType
   status    NotificationStatus @default(UNREAD)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  user      User               @relation(fields: [userId], references: [id])
 }
 
 model Floor {
@@ -175,7 +175,7 @@ model Floor {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   mall        Mall     @relation(fields: [mallId], references: [id])
-  rooms       Rooms[]  // One floor can have many rooms
+  rooms       Rooms[] // One floor can have many rooms
 }
 
 model Payment {
@@ -208,35 +208,35 @@ model Agreement {
 }
 
 model Rent {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
-  roomId    Int     @unique
+  roomId    Int       @unique
   amount    Float
   dueDate   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  room      Rooms    @relation(fields: [roomId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+  room      Rooms     @relation(fields: [roomId], references: [id])
   payments  Payment[] // One rent can have many payments
 }
 
 model Rooms {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   mallId     Int
   floorId    Int
-  roomNumber String    
+  roomNumber String
   size       Float
   price      Float
   status     RoomStatus @default(AVAILABLE)
   categoryId Int?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  mall       Mall     @relation(fields: [mallId], references: [id])
-  floor      Floor    @relation(fields: [floorId], references: [id])
-  category   Category? @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  mall       Mall       @relation(fields: [mallId], references: [id])
+  floor      Floor      @relation(fields: [floorId], references: [id])
+  category   Category?  @relation(fields: [categoryId], references: [id])
   posts      Post[]
-  rent       Rent?    
-  
+  rent       Rent?
+
   @@index([roomNumber]) // Add index on the roomNumber field
 }
 
