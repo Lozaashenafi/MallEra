@@ -1,0 +1,124 @@
+1. Public Pages (website) 
+# web site
+    Home Page (/)
+
+    About Us (/about)
+
+    Services (/services)
+
+    Contact Us (/contact)
+
+    Login (/login)
+
+    Malls (/malls)
+    
+2. Public Pages (Mobile App)
+    Home Page (/app)
+
+    Message (/app/message)
+
+    My Bid (/app/my-bid)
+
+    Profile (/app/profile)
+
+    Notifications (/app/notifications)
+
+    Login (/app/login)
+
+    Malls (/app/malls)
+
+2. MallOwner Management Pages (Login Required)
+# web site
+    MallOwner Dashboard (/admin)
+
+    Tenant Management (/admin/tenant)
+
+    Add Tenant (/admin/tenant/add)
+
+    Edit Tenant (/admin/tenant/edit/:id)
+
+    Tenant Details (/admin/tenant/{tenantId})
+
+    Tenant's full name, work, floor, room number, payment status, and payment duration.
+
+    Room Management (/admin/room)
+
+    Add Room (/admin/room/add)
+
+    Notifications (/admin/notification)
+
+    Payment Receipt  (/admin/notification/payment)
+
+3. Tenant Pages (Login Required)
+# mobile app
+
+    Notifications (/tenant/notification)
+
+    Payment Reminder and Approval (/tenant/notification/payment)
+
+    Notifications related to rent payments.
+
+    Payment (/tenant/payment)
+
+    Pay rent or other fees.
+
+    View Payment History (/tenant/payment/history)
+
+    List of past payments.
+
+    View Rental Agreement (/tenant/agreement)
+
+    View and download rental agreements.
+
+4. Mall Owner Pages (Login Required)
+# mobile app
+
+    Mall Owner Dashboard (/mall-owner)
+
+    Overview of mall activities.
+
+    Mall Details (/mall-owner/malls/{mallId})
+
+    Mall location, name, free spaces, floors, and images.
+
+    Post Management (/mall-owner/posts)
+
+    Create/Edit Post (/mall-owner/posts/create)
+
+    Form to create or edit a post for a mall space.
+
+    Delete Post (/mall-owner/posts/delete/:id)
+
+    Delete a post.
+
+    Bid Management (/mall-owner/bids)
+
+    Review and manage bids for mall spaces.
+
+    Analytics (/mall-owner/analytics)
+
+    View analytics related to space views, inquiries, and tenant engagement.
+
+5. Admin Pages (Login Required)
+# web site
+    Super Admin Dashboard (/superadmin)
+
+    Overview of system-wide activities.
+
+    Manage Malls (/superadmin/malls)
+
+    List of all malls in the system.
+
+    Mall Details (/superadmin/malls/{mallId})
+
+    Mall location, name, free spaces, floors, and images.
+
+    Manage Users (/superadmin/users)
+
+    Activate/Deactivate/Delete User (/superadmin/users/manage/:id)
+
+    Manage user accounts (e.g., activate, deactivate, delete).
+
+    System Settings (/superadmin/settings)
+
+    Configure system-wide settings (e.g., payment gateways, notification preferences).
