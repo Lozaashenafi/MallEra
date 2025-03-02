@@ -14,8 +14,22 @@
     
 2. Public Pages (Mobile App)
     Home Page (/app)
+    -posts 
+    -search bar
 
+    post detail(post/id)
+    -discription 
+    -price 
+    -bid amount
+    -bid button 
+    
+    bid for(post/bid)
+    -ur bid amount 
+    -
     Message (/app/message)
+    -old contact
+    -new messages
+    -fav message 
 
     My Bid (/app/my-bid)
 

@@ -1,0 +1,213 @@
+1. Public Pages (Website and Mobile App)
+- Home Page
+Get Mall List
+GET /api/malls
+Response:
+        [
+        {
+            "id": 1,
+            "mallName": "City Mall",
+            "location": "New York",
+            "description": "A popular shopping destination.",
+            "totalFloors": 5,
+            "totalRooms": 100
+        }
+        ]
+- Login
+User Login
+POST /api/auth/login
+Request Body:
+        {
+        "username": "johndoe",
+        "password": "password123"
+        }
+Response:
+        {
+        "token": "jwt_token_here",
+        "user": {
+            "id": 1,
+            "username": "johndoe",
+            "email": "johndoe@example.com",
+            "role": "USER"
+        }
+        }
+- Malls
+Get Mall Details
+GET /api/malls/{mallId}
+Response:
+        {
+        "id": 1,
+        "mallName": "City Mall",
+        "location": "New York",
+        "description": "A popular shopping destination.",
+        "totalFloors": 5,
+        "totalRooms": 100,
+        "floors": [
+            {
+            "id": 1,
+            "floorNumber": 1,
+            "description": "Ground Floor"
+            }
+        ],
+        "rooms": [
+            {
+            "id": 1,
+            "roomNumber": "101",
+            "size": 500,
+            "price": 1000,
+            "status": "AVAILABLE"
+            }
+        ]
+        }
+2. Mall Owner Management Pages (Login Required)
+- Mall Owner Dashboard
+Get Mall Owner’s Malls
+GET /api/mall-owner/malls
+Response:
+        [
+        {
+            "id": 1,
+            "mallName": "City Mall",
+            "location": "New York",
+            "totalFloors": 5,
+            "totalRooms": 100
+        }
+        ]
+- Tenant Management
+Get All Tenants
+GET /api/admin/tenants
+Response:
+        [
+        {
+            "id": 1,
+            "fullName": "John Doe",
+            "work": "Retail",
+            "floor": 2,
+            "roomNumber": "201",
+            "paymentStatus": "Paid",
+            "paymentDuration": "Monthly"
+        }
+        ]
+Add Tenant
+POST /api/admin/tenants
+Request Body:
+        {
+        "fullName": "Jane Smith",
+        "work": "Food Court",
+        "floor": 1,
+        "roomNumber": "101",
+        "paymentStatus": "Pending",
+        "paymentDuration": "Monthly"
+        }
+Edit Tenant
+PUT /api/admin/tenants/{tenantId}
+Request Body:
+        {
+        "paymentStatus": "Paid"
+        }
+Delete Tenant
+DELETE /api/admin/tenants/{tenantId}
+- Room Management
+Get All Rooms
+GET /api/admin/rooms
+Response:
+        [
+        {
+            "id": 1,
+            "roomNumber": "101",
+            "size": 500,
+            "price": 1000,
+            "status": "AVAILABLE"
+        }
+        ]
+Add Room
+POST /api/admin/rooms
+Request Body:
+        {
+        "mallId": 1,
+        "floorId": 1,
+        "roomNumber": "102",
+        "size": 600,
+        "price": 1200,
+        "status": "AVAILABLE"
+        }
+3. Tenant Pages (Login Required)
+Notifications
+Get Tenant Notifications
+GET /api/tenant/notifications
+Response:
+        [
+        {
+            "id": 1,
+            "message": "Your rent payment is due.",
+            "type": "ALERT",
+            "status": "UNREAD"
+        }
+        ]
+Payment
+Make Payment
+POST /api/tenant/payments
+Request Body:
+        {
+        "rentId": 1,
+        "amount": 1000,
+        "paymentMethod": "Credit Card"
+        }
+Get Payment History
+GET /api/tenant/payments/history
+Response:
+        [
+        {
+            "id": 1,
+            "amount": 1000,
+            "paymentDate": "2023-10-01"
+        }
+        ]
+4. Mall Owner Pages (Login Required)
+Bid Management
+Get All Bids
+GET /api/mall-owner/bids
+Response:
+        [
+        {
+            "id": 1,
+            "bidAmount": 5000,
+            "user": {
+            "id": 1,
+            "username": "johndoe"
+            }
+        }
+        ]
+5. Admin Pages (Login Required)
+Manage Malls
+Get All Malls
+GET /api/superadmin/malls
+Response:
+        [
+        {
+            "id": 1,
+            "mallName": "City Mall",
+            "location": "New York",
+            "totalFloors": 5,
+            "totalRooms": 100
+        }
+        ]
+Manage Users
+Get All Users
+GET /api/superadmin/users
+Response:
+        [
+        {
+            "id": 1,
+            "username": "johndoe",
+            "email": "johndoe@example.com",
+            "role": "USER",
+            "status": "ACTIVE"
+        }
+        ]
+Activate/Deactivate User
+PUT /api/superadmin/users/{userId}/status
+Request Body:
+        {
+        "status": "INACTIVE"
+        }

@@ -1,0 +1,83 @@
+src/
+│
+├── assets/                  # Static assets like images, icons, etc.
+│   └── images/              # Mall images, logos, etc.
+│
+├── components/              # Reusable components
+│   ├── common/              # Common components (e.g., buttons, modals)
+│   │   ├── Button.jsx
+│   │   ├── Modal.jsx
+│   │   └── ...
+│   ├── layout/              # Layout components (e.g., header, footer, sidebar)
+│   │   ├── Header.jsx
+│   │   ├── Footer.jsx
+│   │   └── Sidebar.jsx
+│   ├── malls/               # Components related to malls
+│   │   ├── MallCard.jsx
+│   │   └── ...
+│   ├── tenants/             # Components related to tenants
+│   │   ├── TenantForm.jsx
+│   │   └── ...
+│   └── ...
+│
+├── pages/                   # Page components
+│   ├── public/              # Public pages (no login required)
+│   │   ├── HomePage.jsx     # Home Page (/)
+│   │   ├── AboutPage.jsx    # About Us (/about)
+│   │   ├── ServicesPage.jsx # Services (/services)
+│   │   ├── ContactPage.jsx  # Contact Us (/contact)
+│   │   ├── LoginPage.jsx    # Login (/login)
+│   │   └── MallsPage.jsx    # Malls (/malls)
+│   │
+│   ├── mallOwner/           # Mall Owner pages (login required)
+│   │   ├── Dashboard.jsx    # Mall Owner Dashboard (/mall-owner)
+│   │   ├── MallDetails.jsx  # Mall Details (/mall-owner/malls/{mallId})
+│   │   ├── PostManagement.jsx # Post Management (/mall-owner/posts)
+│   │   ├── BidManagement.jsx # Bid Management (/mall-owner/bids)
+│   │   └── AnalyticsPage.jsx # Analytics (/mall-owner/analytics)
+│   │
+│   ├── admin/               # MallOwner Admin pages (login required)
+│   │   ├── Dashboard.jsx    # MallOwner Dashboard (/admin)
+│   │   ├── TenantManagement.jsx # Tenant Management (/admin/tenant)
+│   │   ├── AddTenant.jsx    # Add Tenant (/admin/tenant/add)
+│   │   ├── EditTenant.jsx   # Edit Tenant (/admin/tenant/edit/:id)
+│   │   ├── TenantDetails.jsx # Tenant Details (/admin/tenant/{tenantId})
+│   │   ├── RoomManagement.jsx # Room Management (/admin/room)
+│   │   ├── AddRoom.jsx      # Add Room (/admin/room/add)
+│   │   ├── Notifications.jsx # Notifications (/admin/notification)
+│   │   └── PaymentReceipt.jsx # Payment Receipt (/admin/notification/payment)
+│   │
+│   ├── superadmin/          # Super Admin pages (login required)
+│   │   ├── Dashboard.jsx    # Super Admin Dashboard (/superadmin)
+│   │   ├── ManageMalls.jsx  # Manage Malls (/superadmin/malls)
+│   │   ├── MallDetails.jsx  # Mall Details (/superadmin/malls/{mallId})
+│   │   ├── ManageUsers.jsx  # Manage Users (/superadmin/users)
+│   │   └── SystemSettings.jsx # System Settings (/superadmin/settings)
+│   │
+│   └── ...
+│
+├── routes/                  # Routing configuration
+│   ├── PublicRoutes.jsx     # Routes for public pages
+│   ├── PrivateRoutes.jsx    # Routes for authenticated users (mall owner, admin, superadmin)
+│   └── index.js             # Main routing file
+│
+├── services/                # API services and utilities
+│   ├── api.js               # Axios instance and API calls
+│   ├── auth.js              # Authentication utilities
+│   └── ...
+│
+├── context/                 # React Context for global state management
+│   ├── AuthContext.jsx      # Authentication context
+│   └── ...
+│
+├── hooks/                   # Custom React hooks
+│   ├── useAuth.js           # Hook for authentication
+│   └── ...
+│
+├── utils/                   # Utility functions
+│   ├── helpers.js           # Helper functions (e.g., date formatting)
+│   └── ...
+│
+├── App.jsx                  # Main App component
+├── index.js                 # Entry point
+└── ...
