@@ -46,6 +46,7 @@ enum UserRole {
 model User {
   id            Int            @id @default(autoincrement())
   username      String         @unique
+  fullName      String
   password      String
   email         String         @unique
   phoneNumber   String?

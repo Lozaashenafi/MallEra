@@ -7,8 +7,11 @@ import AboutUs from "./pages/public/AboutUs";
 import ContactUs from "./pages/public/ContactUs";
 import SignUp from "./pages/public/SignUp";
 import LogIn from "./pages/public/LogIn";
+import { useAuth } from "./Context/authContext";
 
 function App() {
+  const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
+  console.log(isLoggedIn, isAdmin, isOwner, userData);
   return (
     <>
       <Routes>

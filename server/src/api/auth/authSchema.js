@@ -2,7 +2,7 @@ import Joi from "joi";
 
 export default {
   register: Joi.object({
-    name: Joi.string().required(),
+    fullName: Joi.string().required(), // Renamed from 'name' to 'fullName' for consistency
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
   }),
