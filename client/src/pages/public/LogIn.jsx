@@ -37,19 +37,25 @@ function LogIn() {
     setLoading(true);
     console.log("login: " + JSON.stringify(formData));
 
-    const res = await login({ email, password });
-    console.log(res);
+    try {
+      const res = await login({ email, password }); // Try to login
+      console.log(res);
 
-    if (res.success) {
-      localStorage.setItem("token", res.token); // Save token in localStorage
-      // Optionally, you can also store the other user data if you need it
-      localStorage.setItem("userData", JSON.stringify(res.userData));
-      await fetchData(); // Fetch user data after login
-      setIsLoggedIn(true); // Set logged-in state
-    } else {
-      toast.error("Login failed!");
+      if (res.success) {
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("userData", JSON.stringify(res.userData));
+        await fetchData();
+        setIsLoggedIn(true);
+      } else {
+        toast.error(res.message || "Login failed!");
+        console.log(res.message);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error(error.response?.data?.message || "Login failed!"); // Show server error message
     }
-    setLoading(false); // Reset loading state
+
+    setLoading(false);
   };
 
   useEffect(() => {
