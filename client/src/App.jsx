@@ -8,11 +8,14 @@ import ContactUs from "./pages/public/ContactUs";
 import SignUp from "./pages/public/SignUp";
 import LogIn from "./pages/public/LogIn";
 import { useAuth } from "./context/AuthContext";
-import Dashboard from "./pages/admin/dashboard";
+import Dashboard from "./pages/admin/Dashboard";
 import AdminLayout from "./layout/AdminLayout";
 import MallOwner from "./pages/admin/MallOwner";
 import Mall from "./pages/admin/Mall";
 import Settings from "./pages/admin/Settings";
+import AddMallOwner from "./pages/admin/AddMallOwner";
+import MallDetail from "./pages/admin/MallDetail";
+import RegisterMall from "./pages/admin/RegisterMall";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
@@ -33,6 +36,9 @@ function App() {
           <Route path="mall-owners" element={<MallOwner />} />
           <Route path="malls" element={<Mall />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="mall-owners/add" element={<AddMallOwner />} />
+          <Route path="malls/detail" element={<MallDetail />} />
+          <Route path="malls/register" element={<RegisterMall />} />
         </Route>
       </Routes>
     </>

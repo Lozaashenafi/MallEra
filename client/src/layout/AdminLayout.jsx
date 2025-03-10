@@ -5,9 +5,9 @@ import AdminHeader from "../components/layout/AdminHeader";
 
 function AdminLayout() {
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex min-h-screen  w-full">
       <SideBar />
-      <main className="flex-1 bg-gray-100 p-6">
+      <main className="flex-1 ml-60 bg-gray-100 p-6">
         <AdminHeader />
         <Outlet />
       </main>

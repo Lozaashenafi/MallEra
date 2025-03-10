@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
 function SideBar() {
@@ -11,7 +11,7 @@ function SideBar() {
 
   const location = useLocation();
   return (
-    <aside className="w-60 bg-red-700 text-white flex flex-col p-5">
+    <aside className="w-60 bg-red-700 text-white flex flex-col p-5 h-full fixed overflow-y-auto">
       <div className="flex flex-col items-start gap-2">
         <div className="flex items-center gap-2 text-lg font-bold">
           <div className="w-8 h-8 bg-white rounded-md"></div>
@@ -19,7 +19,7 @@ function SideBar() {
         </div>
         <span className="text-sm">Admin Dashboard</span>
       </div>
-      <nav className="mt-5 flex flex-col gap-2">
+      <nav className="mt-5 flex flex-col gap-2 flex-grow overflow-y-auto">
         {menuItems.map((item) => (
           <Link
             key={item.name}

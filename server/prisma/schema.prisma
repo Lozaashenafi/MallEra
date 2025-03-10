@@ -42,46 +42,55 @@ enum UserRole {
   TENANT
   MALL_OWNER
 }
-
 model User {
   id            Int            @id @default(autoincrement())
   username      String         @unique
   fullName      String
   password      String
   email         String         @unique
+  mallId        Int?           // Optional field
+  Mall          Mall?          @relation(fields: [mallId], references: [id]) // Optional relation
   phoneNumber   String?
   status        UserStatus     @default(ACTIVE)
-  role          UserRole       // Role is now a simple field in the User table
-  malls         Mall[]         // One user can have many malls (optional)
-  bids          Bid[]          // One user can have many bids
-  notifications Notification[] // One user can have many notifications
-  profile       Profile?       // One-to-one relationship with Profile
-  rents         Rent[]         // One user can rent many rooms
-  posts         Post[]         // One user can create many posts
-  winner        Winner[]       // One user can win many bids
+  role          UserRole       
+  bids          Bid[]          
+  notifications Notification[] 
+  profile       Profile?       
+  rents         Rent[]         
+  posts         Post[]         
+  winner        Winner[]       
   deposit       Deposit[]     
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   
-  @@index([email]) // Add index on the email field
-  @@index([username]) // Add index on the username field
+  @@index([email]) 
+  @@index([username]) 
 }
 
 model Mall {
-  id          Int      @id @default(autoincrement())
-  mallName    String   @unique // Ensure mall names are unique
-  location    String   // Add @required if location is mandatory
+  id          Int          @id @default(autoincrement())
+  mallName    String       @unique // Ensure mall names are unique
+  latitude    Float
+  longitude   Float
+  address     String
   description String?
   totalFloors Int
   totalRooms  Int
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   rooms       Rooms[]
   floors      Floor[]
   agreements  Agreement[]
   posts       Post[]
+  user        User[]
+  mallImage   MallImage[]
+}
+
+model MallImage {
+  id       Int     @id @default(autoincrement())
+  mallId   Int
+  imageURL String
+  mall     Mall    @relation(fields: [mallId], references: [id]) // Corrected relation
 }
 
 model Post {
