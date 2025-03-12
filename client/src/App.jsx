@@ -16,6 +16,7 @@ import Settings from "./pages/admin/Settings";
 import AddMallOwner from "./pages/admin/AddMallOwner";
 import MallDetail from "./pages/admin/MallDetail";
 import RegisterMall from "./pages/admin/RegisterMall";
+import UpdateMall from "./pages/admin/UpdateMall";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
@@ -37,7 +38,8 @@ function App() {
           <Route path="malls" element={<Mall />} />
           <Route path="settings" element={<Settings />} />
           <Route path="mall-owners/add" element={<AddMallOwner />} />
-          <Route path="malls/detail" element={<MallDetail />} />
+          <Route path="mall/detail/:id" element={<MallDetail />} />
+          <Route path="malls/update/:id" element={<UpdateMall />} />
           <Route path="malls/register" element={<RegisterMall />} />
         </Route>
       </Routes>

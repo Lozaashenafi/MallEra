@@ -10,6 +10,9 @@ const mallSchema = {
     description: Joi.string().allow("").optional(),
     totalFloors: Joi.number().integer().min(1).required(),
     totalRooms: Joi.number().integer().min(1).required(),
+    mainImage: Joi.any().optional(), // Allow images
+    secondaryImage: Joi.any().optional(),
+    tertiaryImage: Joi.any().optional(),
   }),
 };
 

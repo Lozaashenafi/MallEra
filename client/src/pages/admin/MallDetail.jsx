@@ -1,50 +1,73 @@
-import img1 from "../../assets/images/mallDetail1.jpg";
-import img2 from "../../assets/images/mallDetail2.jpg";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getMallDetails } from "../../api/mall";
+
 export default function MallDetail() {
-  const mall = {
-    mallName: "Sunset Mall",
-    location: "123 Main Street, Los Angeles, CA",
-    description:
-      "A premium shopping destination featuring high-end fashion brands, restaurants, and entertainment options.",
-    totalFloors: 5,
-    totalRooms: 120,
-    mallOwner: "John Doe",
-    ownerPhone: "+1 (555) 123-4567",
-    mallImage: img1,
-    ownerImage: img2,
-    rooms: new Array(120).fill(null),
-    floors: new Array(5).fill(null),
-    images: [img1, img2, img1],
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [mall, setMall] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    const fetchMallDetails = async () => {
+      try {
+        const data = await getMallDetails(id);
+        if (data.success) {
+          setMall(data.mall);
+        }
+      } catch (error) {
+        console.error("Error fetching mall details:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMallDetails();
+  }, [id]);
+
+  const handleDisable = () => {
+    // Implement API call to disable the mall here
+    console.log("Mall disabled", id);
+    setShowConfirm(false);
   };
+
+  if (loading) {
+    return <p className="text-center text-gray-500">Loading mall details...</p>;
+  }
+
+  if (!mall) {
+    return <p className="text-center text-gray-500">Mall not found.</p>;
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen p-6 flex justify-center">
       <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg p-6">
-        {/* Mall Profile Image */}
         <div className="flex items-center space-x-4">
           <img
-            src={mall.mallImage}
+            src={mall.images?.[0] || "/default-mall.jpg"}
             alt="Mall Profile"
             className="w-16 h-16 rounded-full object-cover shadow-md"
           />
           <h1 className="text-3xl font-bold text-gray-800">{mall.mallName}</h1>
         </div>
-        <p className="text-gray-600 mt-2">📍 {mall.location}</p>
+        <p className="text-gray-600 mt-2">📍 {mall.address}</p>
         <p className="text-gray-700 mt-4 leading-relaxed">{mall.description}</p>
 
-        {/* Mall Images */}
         <div className="mt-4 grid grid-cols-3 gap-2">
-          {mall.images.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt={`Mall Image ${index + 1}`}
-              className="w-full h-32 object-cover rounded-md shadow-md"
-            />
-          ))}
+          {mall.images?.length > 0 ? (
+            mall.images.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Mall Image ${index + 1}`}
+                className="w-full h-32 object-cover rounded-md shadow-md"
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No images available.</p>
+          )}
         </div>
 
-        {/* Mall Details */}
         <div className="mt-6 grid grid-cols-2 gap-4 text-gray-700">
           <p>
             <span className="font-semibold">Total Floors:</span>{" "}
@@ -56,20 +79,44 @@ export default function MallDetail() {
           </p>
         </div>
 
-        {/* Mall Owner Section */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg shadow-sm flex items-center space-x-4">
-          <img
-            src={mall.ownerImage}
-            alt="Mall Owner"
-            className="w-14 h-14 rounded-full object-cover shadow-md"
-          />
-          <div>
-            <p className="text-lg font-semibold text-gray-800">
-              {mall.mallOwner}
-            </p>
-            <p className="text-gray-600">📞 {mall.ownerPhone}</p>
-          </div>
+        <div className="mt-6 flex space-x-4">
+          <button
+            onClick={() => navigate(`/malls/update/${id}`)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            Update Mall
+          </button>
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+          >
+            Disable Mall
+          </button>
         </div>
+
+        {showConfirm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <p className="text-lg font-semibold">
+                Are you sure you want to disable this mall?
+              </p>
+              <div className="mt-4 flex justify-end space-x-4">
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDisable}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

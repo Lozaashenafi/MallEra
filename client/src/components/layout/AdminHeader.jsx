@@ -1,7 +1,15 @@
 import { Search } from "lucide-react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../api/auth"; // Import logout function
 
 function AdminHeader() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <header className="flex justify-between items-center">
       <div className="relative">
@@ -14,7 +22,9 @@ function AdminHeader() {
       </div>
       <div className="flex gap-4">
         <button className="text-red-700 font-semibold">Home</button>
-        <button className="text-red-700 font-semibold">Logout</button>
+        <button className="text-red-700 font-semibold" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </header>
   );
