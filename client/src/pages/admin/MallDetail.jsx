@@ -1,3 +1,4 @@
+const backendURL = import.meta.env.VITE_API_URL;
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMallDetails } from "../../api/mall";
@@ -44,10 +45,11 @@ export default function MallDetail() {
       <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg p-6">
         <div className="flex items-center space-x-4">
           <img
-            src={mall.images?.[0] || "/default-mall.jpg"}
+            src={`${backendURL}${mall.images?.[0]}`}
             alt="Mall Profile"
             className="w-16 h-16 rounded-full object-cover shadow-md"
           />
+
           <h1 className="text-3xl font-bold text-gray-800">{mall.mallName}</h1>
         </div>
         <p className="text-gray-600 mt-2">📍 {mall.address}</p>
@@ -58,7 +60,7 @@ export default function MallDetail() {
             mall.images.map((img, index) => (
               <img
                 key={index}
-                src={img}
+                src={`${backendURL}${img}`}
                 alt={`Mall Image ${index + 1}`}
                 className="w-full h-32 object-cover rounded-md shadow-md"
               />
@@ -81,7 +83,7 @@ export default function MallDetail() {
 
         <div className="mt-6 flex space-x-4">
           <button
-            onClick={() => navigate(`/malls/update/${id}`)}
+            onClick={() => navigate(`/admin/malls/update/${id}`)}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
             Update Mall
@@ -95,8 +97,8 @@ export default function MallDetail() {
         </div>
 
         {showConfirm && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-50">
+            <div className="bg-neutral-300 p-6 rounded-lg shadow-lg">
               <p className="text-lg font-semibold">
                 Are you sure you want to disable this mall?
               </p>

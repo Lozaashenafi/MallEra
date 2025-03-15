@@ -25,6 +25,16 @@ export const getMall = async () => {
     );
   }
 };
+export const getOwners = async () => {
+  try {
+    const response = await API.get(`/mall/owners`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch mall details"
+    );
+  }
+};
 // Get Mall Details (example of another API call)
 export const getMallDetails = async (mallId) => {
   try {
@@ -40,10 +50,19 @@ export const getMallDetails = async (mallId) => {
 // Update Mall Information
 export const updateMall = async (mallId, mallData) => {
   try {
-    const response = await API.put(`/malls/${mallId}`, mallData);
+    const response = await API.put(`/mall/update/${mallId}`, mallData);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Mall update failed");
+  }
+};
+// User Registration
+export const ownerRegister = async (userData) => {
+  try {
+    const response = await API.post("/mall/owner/register", userData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Registration failed");
   }
 };
 

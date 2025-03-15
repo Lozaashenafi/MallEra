@@ -1,6 +1,7 @@
 import multer from "multer";
 import mallSchema from "./mallSchema.js";
 import prisma from "../../config/prismaClient.js";
+import bcrypt from "bcryptjs";
 
 // Multer storage configuration
 const storage = multer.diskStorage({
@@ -11,6 +12,50 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
+export const getMallOwners = async (req, res) => {
+  try {
+    // Fetch all mall owners
+    const mallOwners = await prisma.user.findMany({
+      where: {
+        role: "MALL_OWNER", // Filter by the MALL_OWNER role
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        Mall: {
+          select: {
+            mallName: true, // Include mall name
+          },
+        },
+      },
+    });
+
+    if (mallOwners.length === 0) {
+      return res.status(404).json({ message: "No mall owners found." });
+    }
+
+    // Return the list of mall owners along with their associated mall information
+    res.status(200).json({
+      success: true,
+      mallOwners: mallOwners.map((owner) => ({
+        id: owner.id,
+        fullName: owner.fullName,
+        email: owner.email,
+        phoneNumber: owner.phoneNumber,
+        mallName: owner.Mall?.mallName, // Optional chaining in case the mall exists
+      })),
+    });
+  } catch (error) {
+    console.error("Error fetching mall owners:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching mall owners",
+      error: error.message,
+    });
+  }
+};
 
 // Use .fields() for multiple fields (mainImage, secondaryImage, tertiaryImage)
 const uploadMallImages = multer({ storage }).fields([
@@ -18,6 +63,161 @@ const uploadMallImages = multer({ storage }).fields([
   { name: "secondaryImage", maxCount: 1 },
   { name: "tertiaryImage", maxCount: 1 },
 ]);
+export const OwnerRegister = async (req, res) => {
+  try {
+    const { fullName, email, phoneNumber, password, confirmPassword, mallId } =
+      req.body;
+    const mallIdInt = parseInt(mallId, 10);
+    if (isNaN(mallIdInt)) {
+      return res.status(400).json({ message: "Invalid mall ID" });
+    }
+    // Validate required fields
+    if (
+      !fullName ||
+      !email ||
+      !phoneNumber ||
+      !password ||
+      !confirmPassword ||
+      !mallId
+    ) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
+    }
+
+    // Check if email is already in use
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already registered." });
+    }
+
+    const mall = await prisma.mall.findUnique({
+      where: {
+        id: mallIdInt, // Use the parsed integer value here
+      },
+    });
+    if (!mall) {
+      return res.status(404).json({ message: "Mall not found." });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the Mall Owner using email as username
+    const mallOwner = await prisma.user.create({
+      data: {
+        fullName,
+        email,
+        phoneNumber,
+        password: hashedPassword,
+        role: "MALL_OWNER",
+        Mall: { connect: { id: mallIdInt } }, // Ensure the mallId exists
+        username: email, // Set username to be the same as email
+      },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Mall Owner registered successfully.", mallOwner });
+  } catch (error) {
+    console.error("Error registering mall owner:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const updateMall = async (req, res) => {
+  const { id } = req.params;
+
+  console.log("Received update request:", req.body);
+  console.log("Received files:", req.files);
+
+  try {
+    const existingMall = await prisma.mall.findUnique({
+      where: { id: parseInt(id) },
+      include: { mallImage: true },
+    });
+
+    if (!existingMall) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Mall not found" });
+    }
+
+    const updateData = {};
+    if (req.body.mallName) updateData.mallName = req.body.mallName;
+    if (req.body.address) updateData.address = req.body.address;
+    if (req.body.description) updateData.description = req.body.description;
+
+    // ✅ Parse numeric fields properly
+    if (req.body.latitude) updateData.latitude = parseFloat(req.body.latitude);
+    if (req.body.longitude)
+      updateData.longitude = parseFloat(req.body.longitude);
+    if (req.body.totalFloors)
+      updateData.totalFloors = parseInt(req.body.totalFloors);
+    if (req.body.totalRooms)
+      updateData.totalRooms = parseInt(req.body.totalRooms);
+
+    console.log("Processed update data:", updateData);
+
+    let updatedMall;
+    if (Object.keys(updateData).length > 0) {
+      updatedMall = await prisma.mall.update({
+        where: { id: parseInt(id) },
+        data: updateData,
+      });
+
+      console.log("Mall updated:", updatedMall);
+    } else {
+      console.log("No changes detected, returning existing mall.");
+      updatedMall = existingMall;
+    }
+
+    // Handle image updates
+    const newImages = [];
+    if (req.files?.mainImage) {
+      newImages.push({
+        mallId: updatedMall.id,
+        imageURL: `/uploads/${req.files.mainImage[0].filename}`,
+      });
+    }
+    if (req.files?.secondaryImage) {
+      newImages.push({
+        mallId: updatedMall.id,
+        imageURL: `/uploads/${req.files.secondaryImage[0].filename}`,
+      });
+    }
+    if (req.files?.tertiaryImage) {
+      newImages.push({
+        mallId: updatedMall.id,
+        imageURL: `/uploads/${req.files.tertiaryImage[0].filename}`,
+      });
+    }
+
+    console.log("New images to upload:", newImages);
+
+    if (newImages.length > 0) {
+      await prisma.mallImage.deleteMany({ where: { mallId: updatedMall.id } });
+      await prisma.mallImage.createMany({ data: newImages });
+      console.log("Images updated successfully.");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Mall updated successfully",
+      mall: updatedMall,
+    });
+  } catch (error) {
+    console.error("Error updating mall:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating mall",
+      error: error.message,
+    });
+  }
+};
 
 export const registerMall = async (req, res) => {
   try {

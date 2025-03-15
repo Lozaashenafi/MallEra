@@ -63,7 +63,7 @@ function LogIn() {
       if (isAdmin) {
         navigate("/admin");
       } else if (isOwner) {
-        navigate("/manager");
+        navigate("/owner");
       } else {
         navigate("/home"); // Navigate to a default page or home
       }

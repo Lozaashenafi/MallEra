@@ -3,13 +3,14 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { Camera } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import { registerMall } from "../../api/mall";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function RegisterMall() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mall, setMall] = useState({
     mallName: "",
-    latitude: 9.145, // Default to Ethiopia
-    longitude: 40.4897, // Default to Ethiopia
+    latitude: 9.145,
+    longitude: 40.4897,
     address: "",
     description: "",
     totalFloors: "",
@@ -115,6 +116,7 @@ export default function RegisterMall() {
 
   return (
     <>
+      <ToastContainer />
       <div className="bg-gray-100 min-h-screen flex items-center justify-center p-6">
         <div className="w-full bg-white shadow-xl rounded-lg p-6">
           <h1 className="text-3xl font-bold text-red-700 mb-6 text-center">

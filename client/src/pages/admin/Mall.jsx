@@ -1,3 +1,4 @@
+const backendURL = import.meta.env.VITE_API_URL;
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getMall } from "../../api/mall";
@@ -9,7 +10,7 @@ function Mall() {
   useEffect(() => {
     const fetchMalls = async () => {
       try {
-        const data = await getMall(); // Fetch mall data
+        const data = await getMall();
         if (data.success) {
           setMalls(data.malls); // Update state with fetched malls
         }
@@ -49,7 +50,7 @@ function Mall() {
                 <div className="w-40 h-40 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
                   {mall.image ? (
                     <img
-                      src={mall.image}
+                      src={`${backendURL}${mall.image}`}
                       alt={mall.mallName}
                       className="w-full h-full object-cover"
                     />

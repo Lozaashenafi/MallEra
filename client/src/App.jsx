@@ -17,12 +17,24 @@ import AddMallOwner from "./pages/admin/AddMallOwner";
 import MallDetail from "./pages/admin/MallDetail";
 import RegisterMall from "./pages/admin/RegisterMall";
 import UpdateMall from "./pages/admin/UpdateMall";
+import { ToastContainer } from "react-toastify";
+import OwnerLayout from "./layout/OwnerLayout";
+import OwnerDashboard from "./pages/mallOwner/OwnerDashboard";
+import MallInfo from "./pages/mallOwner/MallInfo";
+import AddTenant from "./pages/mallOwner/AddTenant";
+import RoomList from "./pages/mallOwner/RoomList";
+import TenantList from "./pages/mallOwner/TenantList";
+import AddRoom from "./pages/mallOwner/AddRoom";
+import RoomPrice from "./pages/mallOwner/RoomPrice";
+import Payment from "./pages/mallOwner/Payment";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
   console.log(isLoggedIn, isAdmin, isOwner, userData);
+
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<RootLayout />}>
           <Route index element={<Home />} />
@@ -32,16 +44,32 @@ function App() {
           <Route path="login" element={<LogIn />} />
           <Route path="signup" element={<SignUp />} />
         </Route>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="mall-owners" element={<MallOwner />} />
-          <Route path="malls" element={<Mall />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="mall-owners/add" element={<AddMallOwner />} />
-          <Route path="mall/detail/:id" element={<MallDetail />} />
-          <Route path="malls/update/:id" element={<UpdateMall />} />
-          <Route path="malls/register" element={<RegisterMall />} />
-        </Route>
+
+        {isAdmin && (
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="mall-owners" element={<MallOwner />} />
+            <Route path="malls" element={<Mall />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="mall-owners/add" element={<AddMallOwner />} />
+            <Route path="mall/detail/:id" element={<MallDetail />} />
+            <Route path="malls/update/:id" element={<UpdateMall />} />
+            <Route path="malls/register" element={<RegisterMall />} />
+          </Route>
+        )}
+
+        {isOwner && (
+          <Route path="/owner" element={<OwnerLayout />}>
+            <Route index element={<OwnerDashboard />} />
+            <Route path="info" element={<MallInfo />} />
+            <Route path="tenant/add" element={<AddTenant />} />
+            <Route path="tenant/list" element={<TenantList />} />
+            <Route path="room/list" element={<RoomList />} />
+            <Route path="room/add" element={<AddRoom />} />
+            <Route path="room/price" element={<RoomPrice />} />
+            <Route path="payment" element={<Payment />} />
+          </Route>
+        )}
       </Routes>
     </>
   );
