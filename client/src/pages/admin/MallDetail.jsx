@@ -1,7 +1,7 @@
 const backendURL = import.meta.env.VITE_API_URL;
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMallDetails } from "../../api/mall";
+import { getMallById } from "../../api/mall";
 
 export default function MallDetail() {
   const { id } = useParams();
@@ -13,7 +13,7 @@ export default function MallDetail() {
   useEffect(() => {
     const fetchMallDetails = async () => {
       try {
-        const data = await getMallDetails(id);
+        const data = await getMallById(id);
         if (data.success) {
           setMall(data.mall);
         }

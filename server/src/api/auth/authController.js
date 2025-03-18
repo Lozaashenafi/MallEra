@@ -68,7 +68,12 @@ export const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, role: user.role, fullName: user.fullName },
+      {
+        userId: user.id,
+        mallId: user.mallId,
+        role: user.role,
+        fullName: user.fullName,
+      },
       process.env.JWT_SECRET,
       {
         expiresIn: "12h", // token will expire in 12 hours

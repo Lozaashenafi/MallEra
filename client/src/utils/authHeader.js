@@ -1,9 +1,11 @@
 // Function to read the data from the user's local storage
+// import jwtDecode from "jwt-decode";
 const getAuth = async () => {
   // Get the token directly from localStorage
   const token = localStorage.getItem("token"); // This is a string, not an object
   let userData = {
-    id: "",
+    userId: "",
+    mallId: "",
     fullName: "",
     role: "",
     token: token || null, // Use the token directly
@@ -13,16 +15,34 @@ const getAuth = async () => {
     const decodedToken = await decodeTokenPayload(token); // Pass the token directly
 
     if (decodedToken) {
-      userData.id = decodedToken.id;
+      userData.userId = decodedToken.userId;
       userData.fullName = decodedToken.fullName;
       userData.role = decodedToken.role;
+      userData.mallId = decodedToken.mallId;
       return userData;
     }
   }
 
   return {}; // Return an empty object if no token is found or token is invalid
 };
+// const decodeTokenPayload = (token) => {
+//   try {
+//     // Decode the token using jwt-decode
+//     const decoded = jwtDecode(token);
 
+//     // Check if the token has expired
+//     const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+//     if (decoded.exp && decoded.exp < currentTime) {
+//       console.log("Token expired");
+//       return null;
+//     }
+
+//     return decoded;
+//   } catch (error) {
+//     console.error("Error decoding token:", error);
+//     return null; // Return null in case of error (invalid token format)
+//   }
+// };
 // Function to decode the payload from the token
 // This code decodes the Base64Url encoded JWT payload and returns it as an object
 const decodeTokenPayload = (token) => {

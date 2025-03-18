@@ -63,6 +63,8 @@ const uploadMallImages = multer({ storage }).fields([
   { name: "secondaryImage", maxCount: 1 },
   { name: "tertiaryImage", maxCount: 1 },
 ]);
+
+const uploadMallAgreement = multer({ storage }).single("agreementFile");
 export const OwnerRegister = async (req, res) => {
   try {
     const { fullName, email, phoneNumber, password, confirmPassword, mallId } =
@@ -225,8 +227,6 @@ export const registerMall = async (req, res) => {
     const { error } = mallSchema.register.validate(req.body, {
       abortEarly: false,
     });
-    // console.log("Received files:", req.files); // Debugging line
-    // console.log("Received body:", req.body); // Log form data
 
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({
@@ -382,6 +382,139 @@ export const getMallById = async (req, res) => {
     });
   }
 };
+export const getMallDetail = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const mall = await prisma.mall.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        mallImage: true, // Include images
+        agreements: true, // Include rental agreements
+        pricePerCare: true, // Include price per care
+      },
+    });
+
+    if (!mall) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Mall not found" });
+    }
+
+    const formattedMall = {
+      ...mall,
+      images: mall.mallImage.map((img) => img.imageURL), // Extract image URLs
+      roomCount: mall.totalRooms, // Include total rooms
+      floorCount: mall.totalFloors, // Include total floors
+      rentalAgreements: mall.agreements.map(
+        (agreement) => agreement.agreementFile
+      ), // Extract agreement file URLs
+      pricePerCare:
+        mall.pricePerCare.length > 0 ? mall.pricePerCare[0].price : null, // Extract price per care
+    };
+
+    res.status(200).json({
+      success: true,
+      mall: formattedMall,
+    });
+  } catch (error) {
+    console.error("Error fetching mall by ID:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching mall",
+      error: error.message,
+    });
+  }
+};
+
+export const mallInfo = async (req, res) => {
+  try {
+    const { mallId, basementCount, floorCount, roomCount, pricePerCare } =
+      req.body;
+    const mallIdInt = parseInt(mallId, 10);
+    const basements = parseInt(basementCount, 10);
+    const floors = parseInt(floorCount, 10);
+    const totalRooms = parseInt(roomCount, 10);
+    const price = parseFloat(pricePerCare); // Convert pricePerCare to Float
+    const agreementFile = req.file; // The uploaded file
+
+    if (!agreementFile) {
+      return res.status(400).json({ message: "No agreement file uploaded" });
+    }
+    if (
+      isNaN(mallIdInt) ||
+      isNaN(basements) ||
+      isNaN(floors) ||
+      isNaN(totalRooms) ||
+      isNaN(price)
+    ) {
+      return res.status(400).json({ message: "Invalid input values." });
+    }
+
+    // Check if mall exists
+    const mall = await prisma.mall.findUnique({ where: { id: mallIdInt } });
+    if (!mall) return res.status(404).json({ message: "Mall not found." });
+
+    // Create floors & basements dynamically
+    const floorData = [];
+
+    for (let i = 1; i <= basements; i++) {
+      floorData.push({
+        mallId: mallIdInt,
+        floorNumber: -i,
+        description: `Basement ${i}`,
+      });
+    }
+
+    for (let i = 1; i <= floors; i++) {
+      floorData.push({
+        mallId: mallIdInt,
+        floorNumber: i,
+        description: `Floor ${i}`,
+      });
+    }
+
+    await prisma.floor.createMany({ data: floorData });
+
+    // Save agreement file
+    let agreementPath = null;
+    if (req.file) {
+      agreementPath = `/uploads/${req.file.filename}`;
+      await prisma.agreement.create({
+        data: {
+          mallId: mallIdInt,
+          agreementFile: agreementPath,
+        },
+      });
+    }
+
+    // Save Price Per Care
+    await prisma.pricePerCare.create({
+      data: {
+        mallId: mallIdInt,
+        price,
+      },
+    });
+
+    // Update mall total rooms
+    await prisma.mall.update({
+      where: { id: mallIdInt },
+      data: { totalRooms },
+    });
+
+    res.status(201).json({
+      message:
+        "Mall floors, basements, price per care, and agreement saved successfully!",
+      agreementFile: agreementPath,
+    });
+  } catch (error) {
+    console.error("Error saving mall info:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
 
 // Middleware for image upload (use .fields() to handle multiple fields)
 export const uploadMallImagesMiddleware = uploadMallImages;
+export const uploadAgreement = uploadMallAgreement;

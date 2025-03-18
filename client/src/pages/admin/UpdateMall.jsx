@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { Camera } from "lucide-react";
 import "leaflet/dist/leaflet.css";
-import { getMallDetails, updateMall } from "../../api/mall";
+import { getMallById, updateMall } from "../../api/mall";
 import { toast, ToastContainer } from "react-toastify";
 
 export default function UpdateMall() {
@@ -27,7 +27,7 @@ export default function UpdateMall() {
   useEffect(() => {
     const fetchMall = async () => {
       try {
-        const data = await getMallDetails(id);
+        const data = await getMallById(id);
         if (data.success) {
           setMall({
             mallName: data.mall.mallName,

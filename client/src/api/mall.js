@@ -1,5 +1,17 @@
 import API from "../utils/api";
 
+export const mallInfo = async (mallData) => {
+  console.log(mallData);
+  try {
+    const response = await API.post("/mall/save-mall-info", mallData);
+    console.log("API Response in registerMall:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "failed to save mall information"
+    );
+  }
+};
 // Register Mall
 export const registerMall = async (mallData) => {
   console.log(mallData);
@@ -36,9 +48,19 @@ export const getOwners = async () => {
   }
 };
 // Get Mall Details (example of another API call)
-export const getMallDetails = async (mallId) => {
+export const getMallById = async (mallId) => {
   try {
     const response = await API.get(`/mall/${mallId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch mall details"
+    );
+  }
+};
+export const getMallDetail = async (mallId) => {
+  try {
+    const response = await API.get(`/mall/detail/${mallId}`);
     return response.data;
   } catch (error) {
     throw new Error(

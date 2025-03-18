@@ -30,7 +30,8 @@ import Payment from "./pages/mallOwner/Payment";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
-  console.log(isLoggedIn, isAdmin, isOwner, userData);
+
+  // console.log(isLoggedIn, isAdmin, isOwner, userData);
 
   return (
     <>

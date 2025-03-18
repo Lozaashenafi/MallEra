@@ -66,6 +66,14 @@ model User {
   @@index([email]) 
   @@index([username]) 
 }
+model PricePerCare{
+  id Int @id @default(autoincrement())
+  mallId Int
+  price Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mall Mall @relation(fields: [mallId], references: [id])
+}
 
 model Mall {
   id          Int          @id @default(autoincrement())
@@ -78,11 +86,11 @@ model Mall {
   totalRooms  Int
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  rooms       Rooms[]
   floors      Floor[]
   agreements  Agreement[]
   posts       Post[]
   user        User[]
+  pricePerCare PricePerCare[]
   mallImage   MallImage[]
 }
 
@@ -226,16 +234,19 @@ model Rent {
 
 model Rooms {
   id         Int      @id @default(autoincrement())
-  mallId     Int
   floorId    Int
   roomNumber String    
-  size       Float
-  price      Float
+  care       Float
+  price      Float?
   status     RoomStatus @default(AVAILABLE)
   categoryId Int?
+  hasWindow  Boolean @default(false)
+  pricePerCare Boolean @default(true)
+  hasBalcony Boolean @default(false)
+  hasAttachedBathroom Boolean @default(false)
+  hasParkingSpace Boolean @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  mall       Mall     @relation(fields: [mallId], references: [id])
   floor      Floor    @relation(fields: [floorId], references: [id])
   category   Category? @relation(fields: [categoryId], references: [id])
   posts      Post[]

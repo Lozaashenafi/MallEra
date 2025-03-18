@@ -30,9 +30,10 @@ export const AuthProvider = ({ children }) => {
         } else if (loggedInUser.role == "MALL_OWNER") {
           setIsOwner(true);
         }
-        const { id, fullName, role, token } = loggedInUser;
+        const { userId, mallId, fullName, role, token } = loggedInUser;
         setUserData({
-          id,
+          userId,
+          mallId,
           fullName,
           role,
           token,
