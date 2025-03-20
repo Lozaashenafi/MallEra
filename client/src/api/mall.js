@@ -25,7 +25,16 @@ export const registerMall = async (mallData) => {
     );
   }
 };
-
+export const getMallName = async (mallId) => {
+  try {
+    const response = await API.get(`/mall/${mallId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch mall name"
+    );
+  }
+};
 // Get Mall Details (example of another API call)
 export const getMall = async () => {
   try {
@@ -95,5 +104,17 @@ export const deleteMall = async (mallId) => {
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Mall deletion failed");
+  }
+};
+
+export const updatePricePerCare = async (priceData) => {
+  try {
+    const response = await API.post(`/mall/pricepercare/add`, priceData);
+    console.log("Price per care updated successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to update price per care"
+    );
   }
 };

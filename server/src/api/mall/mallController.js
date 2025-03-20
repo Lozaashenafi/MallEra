@@ -3,6 +3,78 @@ import mallSchema from "./mallSchema.js";
 import prisma from "../../config/prismaClient.js";
 import bcrypt from "bcryptjs";
 
+export const listPricePerCare = async (req, res) => {
+  const { mallId } = req.query;
+
+  if (!mallId) {
+    return res.status(400).json({ message: "Mall ID is required." });
+  }
+
+  try {
+    const prices = await prisma.pricePerCare.findMany({
+      where: { mallId: parseInt(mallId) },
+      select: {
+        price: true,
+        floor: true, // Select floor ID
+        Floor: {
+          // Join with Floor table to get the description
+          select: {
+            description: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" }, // Optionally order by creation date
+    });
+
+    if (!prices || prices.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No price records found for this mall." });
+    }
+
+    // Map the result to include only floor description and price
+    const formattedPrices = prices.map((price) => ({
+      price: price.price,
+      floorDescription: price.Floor?.description || "No floor", // Handle cases where Floor is null
+    }));
+
+    return res.json(formattedPrices);
+  } catch (error) {
+    console.error("Error fetching prices by mallId:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getMallName = async (req, res) => {
+  const { id } = req.params;
+  console.log("Mall ID received:", id); // Log the ID to check if it's correct
+
+  try {
+    const mall = await prisma.mall.findUnique({
+      where: { id: parseInt(id) },
+      select: { mallName: true },
+    });
+
+    if (!mall) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Mall not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      mallName: mall.mallName,
+    });
+  } catch (error) {
+    console.error("Error fetching mall by ID:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching mall",
+      error: error.message,
+    });
+  }
+};
+
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -25,6 +97,7 @@ export const getMallOwners = async (req, res) => {
         email: true,
         phoneNumber: true,
         Mall: {
+          // Access the related Mall
           select: {
             mallName: true, // Include mall name
           },
@@ -44,7 +117,7 @@ export const getMallOwners = async (req, res) => {
         fullName: owner.fullName,
         email: owner.email,
         phoneNumber: owner.phoneNumber,
-        mallName: owner.Mall?.mallName, // Optional chaining in case the mall exists
+        mallName: owner.Mall ? owner.Mall.mallName : "No mall associated", // Handle null if no mall
       })),
     });
   } catch (error) {
@@ -512,6 +585,57 @@ export const mallInfo = async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+export const addPricePerCare = async (req, res) => {
+  const { mallId, price, floorId } = req.body;
+
+  // Validate input
+  if (!mallId || !price) {
+    return res.status(400).json({ message: "Mall ID and price are required." });
+  }
+
+  try {
+    // Check if there is already a price for this mall and floor
+    const existingPrice = await prisma.pricePerCare.findFirst({
+      where: {
+        mallId: parseInt(mallId, 10),
+        floor: floorId ? parseInt(floorId, 10) : null, // Only check floor if floorId is provided
+      },
+    });
+
+    if (existingPrice) {
+      // If price exists, update it
+      const updatedPrice = await prisma.pricePerCare.update({
+        where: { id: existingPrice.id },
+        data: { price: parseFloat(price) },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Price per care updated successfully.",
+        data: updatedPrice,
+      });
+    } else {
+      // If no price exists for the given floor, create a new price
+      const newPrice = await prisma.pricePerCare.create({
+        data: {
+          mallId: parseInt(mallId, 10),
+          price: parseFloat(price),
+          floor: floorId ? parseInt(floorId, 10) : null, // Handle optional floorId
+        },
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "Price per care added successfully.",
+        data: newPrice,
+      });
+    }
+  } catch (error) {
+    console.error("Error adding price per care:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

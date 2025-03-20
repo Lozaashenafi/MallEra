@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FiHome,
@@ -9,18 +9,37 @@ import {
   FiInfo,
 } from "react-icons/fi";
 import { MdMeetingRoom } from "react-icons/md";
+import { getMallName } from "../../api/mall";
+import { useAuth } from "../../context/AuthContext";
 
 function OwnerSidebar() {
   const location = useLocation();
   const [tenantOpen, setTenantOpen] = useState(false);
   const [roomOpen, setRoomOpen] = useState(false);
+  const [mallName, setMallName] = useState("MallSpot");
+  const { userData } = useAuth();
+
+  useEffect(() => {
+    const fetchMalls = async () => {
+      try {
+        const data = await getMallName(userData.mallId);
+        if (data.success) {
+          setMallName(data.mallName); // Update state with fetched malls
+        }
+      } catch (error) {
+        console.error("Error fetching malls:", error.message);
+        toast.error(error.message);
+      }
+    };
+    fetchMalls();
+  }, []);
 
   return (
     <aside className="w-60 bg-cyan-900 text-white flex flex-col p-5 h-full fixed overflow-y-auto">
       <div className="flex flex-col items-start gap-2">
         <div className="flex items-center gap-2 text-lg font-bold">
           <div className="w-8 h-8 bg-white rounded-md"></div>
-          <span>MallSpot</span>
+          <span>{mallName}</span>
         </div>
         <span className="text-sm">Mall Owner Dashboard</span>
       </div>

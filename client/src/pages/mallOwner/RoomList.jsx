@@ -198,6 +198,7 @@ export default function RoomList() {
             fullWidth
             value={updatedRoomNumber}
             onChange={(e) => setUpdatedRoomNumber(e.target.value)}
+            style={{ marginTop: 16 }}
             sx={{ mb: 2 }}
           />
           <TextField

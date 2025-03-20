@@ -6,15 +6,17 @@ import {
   getRooms,
   updateRoom,
   deleteRoom,
+  updateRoomPrice,
 } from "./roomController.js";
 
 const router = express.Router();
 
 router.post("/add", createRoom);
+router.post("/price", updateRoomPrice);
 router.get("/category", getCategory);
 router.get("/floors", getFloors);
 router.get("/list", getRooms);
-router.post("/update/:id", updateRoom);
-router.post("/delete/:id", deleteRoom);
+router.put("/update/:id", updateRoom);
+router.delete("/delete/:id", deleteRoom);
 
 export default router;

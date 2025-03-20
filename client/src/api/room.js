@@ -47,6 +47,7 @@ export const updateRoom = async (roomId, roomData) => {
     console.log("Room updated successfully:", response.data);
     return response.data;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -58,5 +59,49 @@ export const getRooms = async (mallId) => {
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Failed to fetch rooms");
+  }
+};
+
+export const updateRoomPrice = async (roomData) => {
+  try {
+    const response = await API.post(`/room/price`, roomData);
+    console.log("Room price updated successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to fetch rooms");
+  }
+};
+export const getPricePerCareList = async (mallId) => {
+  try {
+    const response = await API.get(`/mall/pricePerCare/list`, {
+      params: { mallId },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch room price"
+    );
+  }
+};
+export const getCurrentPricePerCare = async (mallId) => {
+  try {
+    const response = await API.get(`/room/pricePerCare`, {
+      params: { mallId },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch current price"
+    );
+  }
+};
+export const updatePricePerCare = async (priceData) => {
+  try {
+    const response = await API.get(`/room/pricePerCare/list`, priceData);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to update price per care"
+    );
   }
 };

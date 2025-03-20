@@ -70,6 +70,8 @@ model PricePerCare{
   id Int @id @default(autoincrement())
   mallId Int
   price Float
+  floor Int?
+  Floor Floor? @relation(fields: [floor], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   mall Mall @relation(fields: [mallId], references: [id])
@@ -188,6 +190,7 @@ model Floor {
   updatedAt   DateTime @updatedAt
   mall        Mall     @relation(fields: [mallId], references: [id])
   rooms       Rooms[]  // One floor can have many rooms
+  pricePerCare PricePerCare[]
 }
 
 model Payment {

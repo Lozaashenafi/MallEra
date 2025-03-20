@@ -55,8 +55,15 @@ export const createRoom = async (req, res) => {
     }
 
     // Fetch the latest pricePerCare value from the PricePerCare table for the mall
+
     const pricePerCareEntry = await prisma.pricePerCare.findFirst({
-      where: { mallId: floor.mall.id },
+      where: {
+        mallId: floor.mall.id, // Ensure it matches the correct mall
+        OR: [
+          { floor: floor.id }, // Exact floor match
+          { floor: null }, // If no exact match, take the one with NULL
+        ],
+      },
       orderBy: { createdAt: "desc" }, // Get the latest entry
     });
 
@@ -149,10 +156,10 @@ export const getRooms = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch rooms." });
   }
 };
-
 export const updateRoom = async (req, res) => {
   const { id } = req.params;
   const { roomNumber, care } = req.body;
+  console.log("Received room data:", req.body);
 
   try {
     // Check if the room exists and is available
@@ -164,7 +171,7 @@ export const updateRoom = async (req, res) => {
       return res.status(404).json({ message: "Room not found." });
     }
 
-    if (room.status !== "available") {
+    if (room.status !== "AVAILABLE") {
       return res
         .status(400)
         .json({ message: "Only available rooms can be updated." });
@@ -172,17 +179,31 @@ export const updateRoom = async (req, res) => {
 
     // Check if the new roomNumber already exists
     const existingRoom = await prisma.rooms.findFirst({
-      where: { roomNumber: parseInt(roomNumber), NOT: { id: parseInt(id) } },
+      where: {
+        roomNumber: roomNumber.toString(), // Ensure roomNumber is a string
+        NOT: { id: parseInt(id) },
+      },
     });
 
     if (existingRoom) {
       return res.status(400).json({ message: "Room number already exists." });
     }
 
-    // Update only roomNumber and care
+    // Ensure care is a valid float
+    const careFloat = parseFloat(care);
+    if (isNaN(careFloat)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid care value. Must be a float." });
+    }
+
+    // Update room
     const updatedRoom = await prisma.rooms.update({
       where: { id: parseInt(id) },
-      data: { roomNumber: parseInt(roomNumber), care },
+      data: {
+        roomNumber: roomNumber.toString(), // Ensure roomNumber is a string
+        care: careFloat, // Ensure care is a float
+      },
     });
 
     res.json({ message: "Room updated successfully.", room: updatedRoom });
@@ -191,6 +212,7 @@ export const updateRoom = async (req, res) => {
     res.status(500).json({ message: "Failed to update room." });
   }
 };
+
 export const deleteRoom = async (req, res) => {
   const { id } = req.params;
 
@@ -204,7 +226,7 @@ export const deleteRoom = async (req, res) => {
       return res.status(404).json({ message: "Room not found." });
     }
 
-    if (room.status !== "available") {
+    if (room.status !== "AVAILABLE") {
       return res
         .status(400)
         .json({ message: "Only available rooms can be deleted." });
@@ -219,5 +241,30 @@ export const deleteRoom = async (req, res) => {
   } catch (error) {
     console.error("Error deleting room:", error);
     res.status(500).json({ message: "Failed to delete room." });
+  }
+};
+
+export const updateRoomPrice = async (req, res) => {
+  const { roomId, price } = req.body;
+
+  // Validate input
+  if (!roomId || price === undefined) {
+    return res.status(400).json({ message: "Room ID and price are required." });
+  }
+
+  try {
+    const updatedRoom = await prisma.rooms.update({
+      where: { id: parseInt(roomId, 10) },
+      data: { price: parseFloat(price) },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Room price updated successfully.",
+      data: updatedRoom,
+    });
+  } catch (error) {
+    console.error("Error updating room price:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
