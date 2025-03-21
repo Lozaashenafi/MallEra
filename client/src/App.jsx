@@ -27,11 +27,13 @@ import TenantList from "./pages/mallOwner/TenantList";
 import AddRoom from "./pages/mallOwner/AddRoom";
 import RoomPrice from "./pages/mallOwner/RoomPrice";
 import Payment from "./pages/mallOwner/Payment";
+import PostPage from "./pages/mallOwner/PostPage";
+import TenantManagement from "./pages/mallOwner/TenantManagement ";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
 
-  // console.log(isLoggedIn, isAdmin, isOwner, userData);
+  console.log(isLoggedIn, isAdmin, isOwner, userData);
 
   return (
     <>
@@ -63,12 +65,12 @@ function App() {
           <Route path="/owner" element={<OwnerLayout />}>
             <Route index element={<OwnerDashboard />} />
             <Route path="info" element={<MallInfo />} />
-            <Route path="tenant/add" element={<AddTenant />} />
-            <Route path="tenant/list" element={<TenantList />} />
             <Route path="room/list" element={<RoomList />} />
             <Route path="room/add" element={<AddRoom />} />
             <Route path="room/price" element={<RoomPrice />} />
             <Route path="payment" element={<Payment />} />
+            <Route path="post" element={<PostPage />} />
+            <Route path="tenant" element={<TenantManagement />} />
           </Route>
         )}
       </Routes>

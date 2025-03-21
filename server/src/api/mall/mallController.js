@@ -45,36 +45,6 @@ export const listPricePerCare = async (req, res) => {
   }
 };
 
-export const getMallName = async (req, res) => {
-  const { id } = req.params;
-  console.log("Mall ID received:", id); // Log the ID to check if it's correct
-
-  try {
-    const mall = await prisma.mall.findUnique({
-      where: { id: parseInt(id) },
-      select: { mallName: true },
-    });
-
-    if (!mall) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Mall not found" });
-    }
-
-    res.status(200).json({
-      success: true,
-      mallName: mall.mallName,
-    });
-  } catch (error) {
-    console.error("Error fetching mall by ID:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching mall",
-      error: error.message,
-    });
-  }
-};
-
 // Multer storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

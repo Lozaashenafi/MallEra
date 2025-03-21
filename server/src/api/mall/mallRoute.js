@@ -10,14 +10,12 @@ import {
   uploadAgreement,
   mallInfo,
   getMallDetail,
-  getMallName,
   addPricePerCare,
   listPricePerCare,
 } from "./mallController.js";
 import { isAdmin } from "../../middleware/auth.js";
 
 const router = express.Router();
-router.get("/:id", getMallName);
 router.post("/register", isAdmin, uploadMallImagesMiddleware, registerMall);
 router.post("/owner/register", isAdmin, OwnerRegister);
 router.post("/save-mall-info", uploadAgreement, mallInfo);

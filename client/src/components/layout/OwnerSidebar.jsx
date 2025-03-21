@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FiHome,
@@ -9,150 +9,93 @@ import {
   FiInfo,
 } from "react-icons/fi";
 import { MdMeetingRoom } from "react-icons/md";
-import { getMallName } from "../../api/mall";
 import { useAuth } from "../../context/AuthContext";
 
 function OwnerSidebar() {
   const location = useLocation();
   const [tenantOpen, setTenantOpen] = useState(false);
   const [roomOpen, setRoomOpen] = useState(false);
-  const [mallName, setMallName] = useState("MallSpot");
   const { userData } = useAuth();
 
-  useEffect(() => {
-    const fetchMalls = async () => {
-      try {
-        const data = await getMallName(userData.mallId);
-        if (data.success) {
-          setMallName(data.mallName); // Update state with fetched malls
-        }
-      } catch (error) {
-        console.error("Error fetching malls:", error.message);
-        toast.error(error.message);
-      }
-    };
-    fetchMalls();
-  }, []);
-
   return (
-    <aside className="w-60 bg-cyan-900 text-white flex flex-col p-5 h-full fixed overflow-y-auto">
-      <div className="flex flex-col items-start gap-2">
-        <div className="flex items-center gap-2 text-lg font-bold">
-          <div className="w-8 h-8 bg-white rounded-md"></div>
-          <span>{mallName}</span>
+    <aside className="w-64 bg-cyan-900 text-white h-screen fixed flex flex-col shadow-lg p-5">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-10 h-10 bg-white rounded-md"></div>
+        <div>
+          <h2 className="text-lg font-semibold">
+            {userData.mallName || "Mall Spot"}
+          </h2>
+          <p className="text-sm text-cyan-200">Mall Owner Dashboard</p>
         </div>
-        <span className="text-sm">Mall Owner Dashboard</span>
       </div>
-      <nav className="mt-5 flex flex-col gap-2 flex-grow overflow-y-auto">
-        <Link
-          to="/owner"
-          className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-            location.pathname === "/owner"
-              ? "text-cyan-400"
-              : "hover:text-cyan-700"
-          }`}
+
+      {/* Navigation */}
+      <nav className="flex flex-col gap-3 flex-grow overflow-y-auto">
+        <SidebarLink to="/owner" icon={<FiHome />} label="Dashboard" />
+        <SidebarLink to="/owner/info" icon={<FiInfo />} label="Mall Info" />
+        <SidebarLink
+          to="/owner/tenant"
+          icon={<FiUsers />}
+          label="Manage Tenant"
+        />
+        <SidebarDropdown
+          label="Manage Room"
+          icon={<MdMeetingRoom />}
+          isOpen={roomOpen}
+          toggleOpen={() => setRoomOpen(!roomOpen)}
         >
-          <FiHome /> Dashboard
-        </Link>
+          <SidebarLink to="/owner/room/add" label="Add Room" />
+          <SidebarLink to="/owner/room/list" label="Room List" />
+          <SidebarLink to="/owner/room/price" label="Room Price" />
+        </SidebarDropdown>
 
-        <Link
-          to="/owner/info"
-          className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-            location.pathname === "/owner/info"
-              ? "text-cyan-400"
-              : "hover:text-cyan-700"
-          }`}
-        >
-          <FiInfo /> Mall Info
-        </Link>
-
-        <div>
-          <button
-            onClick={() => setTenantOpen(!tenantOpen)}
-            className="flex items-center justify-between w-full px-4 py-2 rounded-md hover:text-cyan-700"
-          >
-            <span className="flex items-center gap-2">
-              <FiUsers /> Manage Tenant
-            </span>
-            <FiChevronDown
-              className={`transition-transform ${
-                tenantOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {tenantOpen && (
-            <div className="ml-6 flex flex-col">
-              <Link
-                to="/owner/tenant/add"
-                className="px-4 py-2 hover:text-cyan-700"
-              >
-                Add Tenant
-              </Link>
-              <Link
-                to="/owner/tenant/list"
-                className="px-4 py-2 hover:text-cyan-700"
-              >
-                Tenant List
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <div>
-          <button
-            onClick={() => setRoomOpen(!roomOpen)}
-            className="flex items-center justify-between w-full px-4 py-2 rounded-md hover:text-cyan-700"
-          >
-            <span className="flex items-center gap-2">
-              <MdMeetingRoom /> Manage Room
-            </span>
-            <FiChevronDown
-              className={`transition-transform ${roomOpen ? "rotate-180" : ""}`}
-            />
-          </button>
-          {roomOpen && (
-            <div className="ml-6 flex flex-col">
-              <Link
-                to="/owner/room/add"
-                className="px-4 py-2 hover:text-cyan-700"
-              >
-                Add Room
-              </Link>
-              <Link
-                to="/owner/room/list"
-                className="px-4 py-2 hover:text-cyan-700"
-              >
-                Room List
-              </Link>
-              <Link
-                to="/owner/room/price"
-                className="px-4 py-2 hover:text-cyan-700"
-              >
-                Room Price
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <Link
+        <SidebarLink
           to="/owner/payment"
-          className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-            location.pathname === "/owner/payment"
-              ? "text-cyan-400"
-              : "hover:text-cyan-700"
-          }`}
-        >
-          <FiDollarSign /> Payment
-        </Link>
-
-        <Link
+          icon={<FiDollarSign />}
+          label="Payment"
+        />
+        <SidebarLink
           to="/owner/settings"
-          className="flex items-center gap-2 px-4 py-2 rounded-md hover:text-cyan-700"
-        >
-          <FiSettings /> Settings
-        </Link>
+          icon={<FiSettings />}
+          label="Settings"
+        />
       </nav>
     </aside>
+  );
+}
+
+function SidebarLink({ to, icon, label }) {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  return (
+    <Link
+      to={to}
+      className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+        isActive ? "bg-cyan-700" : "hover:bg-cyan-800"
+      }`}
+    >
+      {icon} <span>{label}</span>
+    </Link>
+  );
+}
+
+function SidebarDropdown({ label, icon, isOpen, toggleOpen, children }) {
+  return (
+    <div>
+      <button
+        onClick={toggleOpen}
+        className="flex items-center justify-between w-full px-4 py-2 rounded-lg hover:bg-cyan-800"
+      >
+        <span className="flex items-center gap-3">
+          {icon} {label}
+        </span>
+        <FiChevronDown
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      {isOpen && <div className="ml-6 flex flex-col gap-1">{children}</div>}
+    </div>
   );
 }
 

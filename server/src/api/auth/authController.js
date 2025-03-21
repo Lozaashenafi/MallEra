@@ -40,8 +40,6 @@ export const register = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// Login Admin or MallOwner
 export const login = async (req, res) => {
   try {
     // Validate request body
@@ -66,19 +64,32 @@ export const login = async (req, res) => {
         .status(401)
         .json({ message: "Invalid credentials", success: false });
 
-    // Generate JWT token
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        mallId: user.mallId,
-        role: user.role,
-        fullName: user.fullName,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "12h", // token will expire in 12 hours
-      }
-    );
+    let mallName = null;
+
+    // If the user is a MALL_OWNER, fetch the mall name
+    if (user.role === "MALL_OWNER" && user.mallId) {
+      const mall = await prisma.mall.findUnique({
+        where: { id: user.mallId },
+        select: { mallName: true },
+      });
+      mallName = mall ? mall.mallName : null;
+    }
+
+    // Generate JWT token with mallName only for MALL_OWNER
+    const tokenPayload = {
+      userId: user.id,
+      mallId: user.mallId,
+      role: user.role,
+      fullName: user.fullName,
+    };
+
+    if (mallName) {
+      tokenPayload.mallName = mallName; // Add mallName only for MALL_OWNER
+    }
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "12h", // token will expire in 12 hours
+    });
 
     res.json({ message: "Login successful", token, success: true });
   } catch (error) {
