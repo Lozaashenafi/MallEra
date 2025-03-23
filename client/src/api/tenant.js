@@ -16,3 +16,13 @@ export const getTenants = async (mallId) => {
     throw new Error(error.response?.data?.message || "Failed to fetch tenants");
   }
 };
+
+export const updateTenant = async (tenantId, updatedData) => {
+  try {
+    const response = await API.put(`/tenant/update/${tenantId}`, updatedData);
+    console.log("Tenant updated:", response);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to update tenant");
+  }
+};

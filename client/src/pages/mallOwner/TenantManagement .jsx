@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { tenantRegister, getTenants } from "../../api/tenant"; // Import API functions
+import { tenantRegister, getTenants, updateTenant } from "../../api/tenant";
 import { useAuth } from "../../context/AuthContext";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import CSS for Toast
+import "react-toastify/dist/ReactToastify.css";
 import {
   Table,
   TableBody,
@@ -13,6 +13,11 @@ import {
   Paper,
   TextField,
   IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,54 +30,54 @@ const TenantManagement = () => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
-    mallId: "", // Start with an empty mallId
+    mallId: "",
   });
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
   const { userData } = useAuth();
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState(null);
+  const [updatedData, setUpdatedData] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+  });
 
   useEffect(() => {
-    // Check if userData is available
-    if (userData && userData.mallId) {
+    if (userData?.mallId) {
       setFormData((prevData) => ({
         ...prevData,
-        mallId: userData.mallId, // Set mallId once userData is available
+        mallId: userData.mallId,
       }));
-      fetchTenants(); // Fetch tenants when mallId is available
+      fetchTenants();
     }
-  }, [userData]); // Re-run this effect when userData changes
+  }, [userData]);
 
   const fetchTenants = async () => {
     if (!userData.mallId) return;
     setLoading(true);
     try {
-      const response = await getTenants(userData.mallId); // Get tenants data from API
-      console.log("Tenants fetched:", response); // Log the response for debugging
-      setTenants(response.tenants); // Assuming the API returns { tenants: [...] }
+      const response = await getTenants(userData.mallId);
+      setTenants(response.tenants);
     } catch (error) {
-      console.error("Error fetching tenants:", error);
-      setMessage(error.message);
-      toast.error("Error fetching tenants: " + error.message); // Toast error message
+      toast.error("Error fetching tenants: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Submit form to add a tenant
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
     try {
-      const response = await tenantRegister(formData);
-      setMessage(response.message);
+      await tenantRegister(formData);
+      fetchTenants();
+      toast.success("Tenant added successfully!");
       setFormData({
         fullName: "",
         email: "",
@@ -80,14 +85,33 @@ const TenantManagement = () => {
         password: "",
         confirmPassword: "",
       });
-      fetchTenants(); // Refresh list after adding
-      toast.success("Tenant added successfully!"); // Toast success message
     } catch (error) {
-      console.error("Error adding tenant:", error);
-      setMessage(error.message);
-      toast.error("Error adding tenant: " + error.message); // Toast error message
+      toast.error("Error adding tenant: " + error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (tenant) => {
+    setSelectedTenant(tenant);
+    setUpdatedData({
+      fullName: tenant.fullName,
+      email: tenant.email,
+      phoneNumber: tenant.phoneNumber,
+    });
+    setOpenEdit(true);
+  };
+
+  const handleUpdate = async () => {
+    if (!selectedTenant) return;
+    try {
+      await updateTenant(selectedTenant.id, updatedData);
+      toast.success("Tenant updated successfully!");
+
+      fetchTenants();
+      setOpenEdit(false);
+    } catch (error) {
+      toast.error("Error updating tenant: " + error.message);
     }
   };
 
@@ -98,23 +122,12 @@ const TenantManagement = () => {
       tenant.phoneNumber.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleEdit = (tenant) => {
-    // Add edit functionality here
-    console.log("Edit tenant:", tenant);
-  };
-
-  const handleDelete = (tenantId) => {
-    // Add delete functionality here
-    console.log("Delete tenant with ID:", tenantId);
-  };
-
   return (
     <div className="container mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Tenant Management</h2>
-      {/* Add Tenant Form */}
+
       <div className="bg-white shadow-md rounded p-4 mb-6">
         <h3 className="text-lg font-semibold mb-3">Add Tenant</h3>
-        {message && <p className="text-red-500">{message}</p>}
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
           <input
             type="text"
@@ -161,7 +174,6 @@ const TenantManagement = () => {
             required
             className="p-2 border rounded"
           />
-
           <button
             type="submit"
             className="col-span-2 bg-blue-500 text-white p-2 rounded"
@@ -170,7 +182,7 @@ const TenantManagement = () => {
           </button>
         </form>
       </div>
-      {/* Search Tenant */}
+
       <TextField
         label="Search Tenant"
         variant="outlined"
@@ -178,10 +190,9 @@ const TenantManagement = () => {
         sx={{ mb: 2 }}
         onChange={(e) => setSearch(e.target.value)}
       />
-      {/* List Tenants */}
+
       <div className="bg-white shadow-md rounded p-4">
         <h3 className="text-lg font-semibold mb-3">List Tenants</h3>
-
         {filteredTenants.length > 0 ? (
           <TableContainer component={Paper}>
             <Table>
@@ -206,10 +217,7 @@ const TenantManagement = () => {
                       >
                         <EditIcon />
                       </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDelete(tenant.id)}
-                      >
+                      <IconButton color="error">
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
@@ -222,7 +230,47 @@ const TenantManagement = () => {
           <p>No tenants found.</p>
         )}
       </div>
-      <ToastContainer /> {/* Toast container to render toasts */}
+
+      <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
+        <DialogTitle>Edit Tenant</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Full Name"
+            className="mt-14"
+            fullWidth
+            value={updatedData.fullName}
+            onChange={(e) =>
+              setUpdatedData({ ...updatedData, fullName: e.target.value })
+            }
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            value={updatedData.email}
+            onChange={(e) =>
+              setUpdatedData({ ...updatedData, email: e.target.value })
+            }
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Phone Number"
+            fullWidth
+            value={updatedData.phoneNumber}
+            onChange={(e) =>
+              setUpdatedData({ ...updatedData, phoneNumber: e.target.value })
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
+          <Button variant="contained" color="primary" onClick={handleUpdate}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <ToastContainer />
     </div>
   );
 };

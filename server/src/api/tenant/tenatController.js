@@ -107,3 +107,50 @@ export const listTenants = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+export const updateTenant = async (req, res) => {
+  try {
+    const tenantId = parseInt(req.params.tenantId, 10);
+    if (isNaN(tenantId)) {
+      return res.status(400).json({ message: "Invalid tenant ID" });
+    }
+    const { fullName, email, phoneNumber, mallId } = req.body;
+    // Check if tenant exists
+    const tenant = await prisma.user.findUnique({
+      where: { id: tenantId, role: "TENANT" },
+    });
+    if (!tenant) {
+      return res.status(404).json({ message: "Tenant not found." });
+    }
+
+    let mallUpdate = {};
+    if (mallId) {
+      const mallIdInt = parseInt(mallId, 10);
+      if (isNaN(mallIdInt)) {
+        return res.status(400).json({ message: "Invalid mall ID" });
+      }
+
+      const mall = await prisma.mall.findUnique({ where: { id: mallIdInt } });
+      if (!mall) {
+        return res.status(404).json({ message: "Mall not found." });
+      }
+
+      mallUpdate = { Mall: { connect: { id: mallIdInt } } };
+    }
+    // Update tenant details
+    const updatedTenant = await prisma.user.update({
+      where: { id: tenantId },
+      data: {
+        fullName,
+        email,
+        phoneNumber,
+        ...mallUpdate,
+      },
+    });
+    res
+      .status(200)
+      .json({ message: "Tenant updated successfully.", updatedTenant });
+  } catch (error) {
+    console.error("Error updating tenant:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};

@@ -34,11 +34,6 @@ function OwnerSidebar() {
       <nav className="flex flex-col gap-3 flex-grow overflow-y-auto">
         <SidebarLink to="/owner" icon={<FiHome />} label="Dashboard" />
         <SidebarLink to="/owner/info" icon={<FiInfo />} label="Mall Info" />
-        <SidebarLink
-          to="/owner/tenant"
-          icon={<FiUsers />}
-          label="Manage Tenant"
-        />
         <SidebarDropdown
           label="Manage Room"
           icon={<MdMeetingRoom />}
@@ -49,7 +44,12 @@ function OwnerSidebar() {
           <SidebarLink to="/owner/room/list" label="Room List" />
           <SidebarLink to="/owner/room/price" label="Room Price" />
         </SidebarDropdown>
-
+        <SidebarLink
+          to="/owner/tenant"
+          icon={<FiUsers />}
+          label="Manage Tenant"
+        />
+        <SidebarLink to="/owner/rent" icon={<FiUsers />} label="Manage Rent" />
         <SidebarLink
           to="/owner/payment"
           icon={<FiDollarSign />}

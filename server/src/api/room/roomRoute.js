@@ -7,6 +7,7 @@ import {
   updateRoom,
   deleteRoom,
   updateRoomPrice,
+  getAvailableRooms,
 } from "./roomController.js";
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.post("/price", updateRoomPrice);
 router.get("/category", getCategory);
 router.get("/floors", getFloors);
 router.get("/list", getRooms);
+router.get("/availablelist", getAvailableRooms);
 router.put("/update/:id", updateRoom);
 router.delete("/delete/:id", deleteRoom);
 

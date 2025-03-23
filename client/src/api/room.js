@@ -61,7 +61,18 @@ export const getRooms = async (mallId) => {
     throw new Error(error.response?.data?.message || "Failed to fetch rooms");
   }
 };
+export const getAvailableRooms = async (mallId) => {
+  try {
+    const response = await API.get(`/room/availablelist`, {
+      params: { mallId },
+    });
+    console.log("Fetched rooms:", response);
 
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to fetch rooms");
+  }
+};
 export const updateRoomPrice = async (roomData) => {
   try {
     const response = await API.post(`/room/price`, roomData);

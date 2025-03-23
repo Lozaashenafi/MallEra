@@ -156,6 +156,35 @@ export const getRooms = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch rooms." });
   }
 };
+export const getAvailableRooms = async (req, res) => {
+  const { mallId } = req.query; // Get mallId from request query
+
+  if (!mallId) {
+    return res.status(400).json({ message: "Mall ID is required." });
+  }
+
+  try {
+    const rooms = await prisma.rooms.findMany({
+      where: {
+        floor: {
+          mallId: parseInt(mallId), // Filter by mallId
+        },
+        status: "AVAILABLE", // Ensure only available rooms are fetched
+      },
+      include: {
+        floor: {
+          select: { description: true }, // Include floor description
+        },
+      },
+    });
+
+    res.json(rooms);
+  } catch (error) {
+    console.error("Error fetching available rooms:", error);
+    res.status(500).json({ message: "Failed to fetch available rooms." });
+  }
+};
+
 export const updateRoom = async (req, res) => {
   const { id } = req.params;
   const { roomNumber, care } = req.body;

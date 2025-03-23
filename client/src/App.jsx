@@ -21,14 +21,13 @@ import { ToastContainer } from "react-toastify";
 import OwnerLayout from "./layout/OwnerLayout";
 import OwnerDashboard from "./pages/mallOwner/OwnerDashboard";
 import MallInfo from "./pages/mallOwner/MallInfo";
-import AddTenant from "./pages/mallOwner/AddTenant";
 import RoomList from "./pages/mallOwner/RoomList";
-import TenantList from "./pages/mallOwner/TenantList";
 import AddRoom from "./pages/mallOwner/AddRoom";
 import RoomPrice from "./pages/mallOwner/RoomPrice";
 import Payment from "./pages/mallOwner/Payment";
 import PostPage from "./pages/mallOwner/PostPage";
 import TenantManagement from "./pages/mallOwner/TenantManagement ";
+import RentManagement from "./pages/mallOwner/RentManagement";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
@@ -71,6 +70,7 @@ function App() {
             <Route path="payment" element={<Payment />} />
             <Route path="post" element={<PostPage />} />
             <Route path="tenant" element={<TenantManagement />} />
+            <Route path="rent" element={<RentManagement />} />
           </Route>
         )}
       </Routes>
