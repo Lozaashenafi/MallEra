@@ -1,0 +1,101 @@
+import prisma from "../../config/prismaClient.js";
+import postSchema from "./postSchema.js";
+import multer from "multer";
+import path from "path";
+
+// Multer configuration (Stores images in 'uploads/post/' folder)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/post/"); // Ensure this folder exists
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage });
+
+export const addPosts = async (req, res) => {
+  try {
+    // Validate request body
+    const { error } = postSchema.addPost.validate(req.body);
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
+
+    const {
+      mallId,
+      roomId,
+      title,
+      description,
+      price,
+      bidDeposit,
+      userId,
+      status,
+    } = req.body;
+
+    // Check if the room exists and is AVAILABLE
+    const room = await prisma.rooms.findUnique({
+      where: { id: Number(roomId) },
+    });
+
+    if (!room) return res.status(404).json({ error: "Room not found" });
+    if (room.status !== "AVAILABLE")
+      return res.status(400).json({ error: "Room is not available" });
+
+    // Create the post
+    const newPost = await prisma.post.create({
+      data: {
+        mallId: Number(mallId),
+        roomId: Number(roomId),
+        title,
+        description,
+        price: price ? parseFloat(price) : null,
+        bidDeposit: bidDeposit ? parseFloat(bidDeposit) : null,
+        userId: Number(userId),
+        status: status || "PENDING",
+      },
+    });
+
+    // Save image URLs to the database (if images exist)
+    if (req.files && req.files.length > 0) {
+      const imageRecords = req.files.map((file) => ({
+        postId: newPost.id,
+        imageURL: `/uploads/post/${file.filename}`, // Change this if using cloud storage
+      }));
+
+      await prisma.postImage.createMany({ data: imageRecords });
+    }
+
+    res.status(201).json(newPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create post" });
+  }
+};
+
+// Middleware for handling file uploads
+export const uploadPostImages = upload.array("images", 3); // Max 3 images
+
+export const getPosts = async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({
+      include: { room: true },
+    });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch posts" });
+  }
+};
+export const postDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await prisma.post.findUnique({
+      where: { id: parseInt(id) },
+      include: { user: true, mall: true, room: true, bids: true, images: true },
+    });
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch post" });
+  }
+};

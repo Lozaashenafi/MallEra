@@ -7,9 +7,7 @@ export const mallInfo = async (mallData) => {
     console.log("API Response in registerMall:", response.data);
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "failed to save mall information"
-    );
+    throw error;
   }
 };
 // Register Mall
@@ -20,9 +18,7 @@ export const registerMall = async (mallData) => {
     console.log("API Response in registerMall:", response.data);
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Mall registration failed"
-    );
+    throw error;
   }
 };
 export const getMallName = async (mallId) => {
@@ -84,7 +80,7 @@ export const updateMall = async (mallId, mallData) => {
     const response = await API.put(`/mall/update/${mallId}`, mallData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Mall update failed");
+    throw error;
   }
 };
 // User Registration
@@ -93,7 +89,7 @@ export const ownerRegister = async (userData) => {
     const response = await API.post("/mall/owner/register", userData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Registration failed");
+    throw error;
   }
 };
 

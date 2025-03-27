@@ -29,7 +29,7 @@ function Services() {
         {services.map((service, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-lg p-6 w-80 text-center border"
+            className="bg-white shadow-lg rounded-lg p-6 w-80 text-center "
           >
             <div className="text-4xl mb-4">{service.icon}</div>
             <h3 className="text-lg font-semibold">{service.title}</h3>

@@ -44,7 +44,12 @@ function RoomPrice() {
       setCurrentPrice(newPrice); // Update UI after successful update
     } catch (error) {
       console.error("Error updating price:", error);
-      toast.error("Failed to update price.");
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Failed to update price."
+      );
     }
   };
   const handleUpdatePrice = async () => {
@@ -60,12 +65,17 @@ function RoomPrice() {
       toast.success(response.message || "Price updated successfully!");
     } catch (error) {
       console.error("Error updating price:", error);
-      toast.error("Failed to update price.");
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Failed to update price."
+      );
     }
   };
   return (
     <>
-      <div className="flex gap-6 mt-4 justify-center items-center">
+      <div className="flex max-w-5xl gap-6 mt-4 mx-auto p-6  shadow-md rounded-lg  justify-center items-center bg-white">
         <div className="bg-white p-6 rounded-2xl shadow-md w-1/2 border border-gray-300">
           <h2 className="text-lg text-black mb-4">
             add or update Price Per Care

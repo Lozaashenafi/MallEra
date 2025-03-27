@@ -40,19 +40,28 @@ function LogIn() {
     try {
       const res = await login({ email, password }); // Try to login
       console.log(res);
-
       if (res.success) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("userData", JSON.stringify(res.userData));
         await fetchData();
         setIsLoggedIn(true);
       } else {
-        toast.error(res.message || "Login failed!");
+        toast.error(
+          error.response?.data?.message ||
+            error.response?.data ||
+            error.message ||
+            "Login failed!"
+        );
         console.log(res.message);
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Login failed!"); // Show server error message
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Login failed!"
+      ); // Show server error message
     }
 
     setLoading(false);

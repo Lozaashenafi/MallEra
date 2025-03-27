@@ -68,7 +68,12 @@ function AddMallOwner() {
         mallId: "",
       });
     } catch (error) {
-      setError(error.message || "Registration failed");
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Registration failed"
+      );
     }
   };
 

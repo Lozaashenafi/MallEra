@@ -78,9 +78,12 @@ const RentList = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 flex items-center justify-center">
+    <div
+      className="p-6    max-w-5xl gap-6 mt-4 mx-auto  shadow-md rounded-lg
+      justify-center items-center bg-white"
+    >
       <ToastContainer />
-      <div className="bg-white shadow-md rounded-lg p-6 w-full lg:w-4/5 max-w-4xl">
+      <div className="bg-white p-6 w-full lg:w-4/5 max-w-4xl">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Rent List</h2>
 
         <TextField

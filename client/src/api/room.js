@@ -79,7 +79,7 @@ export const updateRoomPrice = async (roomData) => {
     console.log("Room price updated successfully:", response.data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch rooms");
+    throw error;
   }
 };
 export const getPricePerCareList = async (mallId) => {
@@ -111,8 +111,6 @@ export const updatePricePerCare = async (priceData) => {
     const response = await API.get(`/room/pricePerCare/list`, priceData);
     return response.data;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || "Failed to update price per care"
-    );
+    throw error;
   }
 };

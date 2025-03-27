@@ -28,6 +28,9 @@ import Payment from "./pages/mallOwner/Payment";
 import PostPage from "./pages/mallOwner/PostPage";
 import TenantManagement from "./pages/mallOwner/TenantManagement ";
 import RentManagement from "./pages/mallOwner/RentManagement";
+import ProfilePage from "./pages/mallOwner/ProfilePage";
+import NotificationPage from "./pages/mallOwner/NotificationPage";
+import OwnerSettings from "./pages/mallOwner/OwnerSettings";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
@@ -71,6 +74,9 @@ function App() {
             <Route path="post" element={<PostPage />} />
             <Route path="tenant" element={<TenantManagement />} />
             <Route path="rent" element={<RentManagement />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="notifications" element={<NotificationPage />} />
+            <Route path="settings" element={<OwnerSettings />} />
           </Route>
         )}
       </Routes>

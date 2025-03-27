@@ -43,8 +43,8 @@ export default function Payment() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="border rounded-lg p-6 shadow-lg bg-white">
+    <div className="flex max-w-5xl gap-6 mt-4 mx-auto p-6  shadow-md rounded-lg  justify-center items-center bg-white">
+      <div className="bg-white p-6 rounded-2xl shadow-md w-1/2 border border-gray-300">
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">
           Make a Payment
         </h2>
@@ -95,6 +95,7 @@ export default function Payment() {
           </button>
         </form>
       </div>
+      <div className="bg-white p-6 rounded-2xl shadow-md w-1/2 border border-gray-300"></div>
     </div>
   );
 }

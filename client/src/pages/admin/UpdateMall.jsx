@@ -88,12 +88,20 @@ export default function UpdateMall() {
         }, 1000);
       } else {
         console.error("Update failed:", result);
-        toast.error(result?.message || "Mall update failed! Please try again.");
+        toast.error(
+          error.response?.data?.message ||
+            error.response?.data ||
+            error.message ||
+            "Mall update failed! Please try again."
+        );
       }
     } catch (error) {
       console.error("Error updating mall:", error);
       toast.error(
-        error.message || "Mall update failed! Please check the logs."
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Mall update failed! Please try again."
       );
     }
   };

@@ -83,9 +83,15 @@ const RentManagement = () => {
 
   return (
     <>
-      <div className="p-6 bg-gray-100 flex items-center justify-center">
+      <div
+        className="p-6   max-w-5xl gap-10 mt-4 mx-auto  shadow-md rounded-lg
+      justify-center items-center bg-white "
+      >
+        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+          Rent Management
+        </h2>
         <ToastContainer />
-        <div className="bg-white shadow-md rounded-lg p-6 w-full lg:w-4/5 max-w-4xl">
+        <div className="bg-white  p-6 w-full ">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
             Assign Rent
           </h2>
@@ -167,7 +173,7 @@ const RentManagement = () => {
             <div className="col-span-2">
               <button
                 type="submit"
-                className="w-full bg-cyan-700 text-white py-2 px-4 rounded-md hover:bg-cyan-600 transition"
+                className="w-1xl bg-cyan-700 text-white py-2 px-4 rounded-md hover:bg-cyan-600 transition"
               >
                 Assign Rent
               </button>

@@ -112,7 +112,7 @@ export default function RoomList() {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg mt-5">
       <TextField
         label="Search Room"
         variant="outlined"
@@ -153,7 +153,7 @@ export default function RoomList() {
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-white ${
-                        room.status === "available"
+                        room.status === "AVAILABLE"
                           ? "bg-green-500"
                           : "bg-red-500"
                       }`}

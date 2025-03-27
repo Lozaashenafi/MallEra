@@ -61,11 +61,11 @@ export default function AddRoom() {
         hasParkingSpace: false,
       });
     } catch (error) {
-      console.error("Error adding room:", error);
+      // console.error("Error adding room:", error);
 
-      // Log the full error object for debugging
-      console.error("Full Error Object:", error);
-      console.error("Error Response Data:", error.response?.data);
+      // // Log the full error object for debugging
+      // console.error("Full Error Object:", error);
+      // console.error("Error Response Data:", error.response?.data);
 
       // Correctly extract the error message
       const errorMessage =
@@ -81,7 +81,7 @@ export default function AddRoom() {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg mt-5">
+      <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg mt-5">
         <h2 className="text-xl font-bold mb-4">Add Room</h2>
         <form
           onSubmit={handleSubmit}
@@ -203,10 +203,10 @@ export default function AddRoom() {
           </div>
 
           {/* Submit Button */}
-          <div className="col-span-2">
+          <div className=" justify-items-end">
             <button
               type="submit"
-              className="w-full bg-cyan-700 text-white font-semibold py-2 px-4 rounded hover:bg-cyan-500 transition duration-300"
+              className="w-1xl bg-cyan-700 text-white font-semibold py-2 px-4 rounded hover:bg-cyan-500 transition duration-300"
             >
               Add Room
             </button>

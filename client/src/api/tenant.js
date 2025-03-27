@@ -4,7 +4,7 @@ export const tenantRegister = async (userData) => {
     const response = await API.post("/tenant/register", userData);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Registration failed");
+    throw error;
   }
 };
 export const getTenants = async (mallId) => {
@@ -23,6 +23,6 @@ export const updateTenant = async (tenantId, updatedData) => {
     console.log("Tenant updated:", response);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to update tenant");
+    throw error;
   }
 };

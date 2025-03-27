@@ -64,58 +64,67 @@ function MallInfo() {
       setAgreementFile(null);
       document.getElementById("agreementFileInput").value = ""; // Reset file input manually
     } catch (error) {
-      toast.error(error.message || "Failed to save mall information.");
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Failed to save mall information."
+      );
     }
   };
   return (
-    <div>
+    <div className="max-w-5xl mx-auto p-8 bg-white shadow-xl rounded-xl mt-8">
       {submitted ? (
-        // Display mall details when submitted is true
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-          <h1 className="text-3xl font-bold mb-4 text-cyan-900">
+        <div>
+          <h1 className="text-4xl font-extrabold text-cyan-900 mb-4">
             {mall.mallName}
           </h1>
-          <p className="text-gray-700">{mall.description}</p>
-          <p className="mt-2 text-gray-600">
-            <strong>Location:</strong> {mall.address}
+          <p className="text-lg text-gray-700 leading-relaxed">
+            {mall.description}
           </p>
-          <p className="mt-1 text-gray-600">
-            <strong>Floors:</strong> {mall.totalFloors} |{" "}
-            <strong>Rooms:</strong> {mall.totalRooms}
-          </p>
-          <p className="mt-1 text-gray-600">
-            <strong>Price Per Care:</strong> ${mall.pricePerCare.toFixed(2)}
-          </p>
+          <div className="mt-4 text-gray-600 space-y-2">
+            <p>
+              <strong>📍 Location:</strong> {mall.address}
+            </p>
+            <p>
+              <strong>🏢 Floors:</strong> {mall.totalFloors} |{" "}
+              <strong>🚪 Rooms:</strong> {mall.totalRooms}
+            </p>
+            <p>
+              <strong>💰 Price Per Care:</strong> $
+              {mall.pricePerCare.toFixed(2)}
+            </p>
+          </div>
 
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold">Images</h2>
-            <div className="grid grid-cols-3 gap-4 mt-2">
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-2">Mall Images</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {mall.mallImage.map((image) => (
                 <img
                   key={image.id}
                   src={`${backendURL}${image.imageURL}`}
                   alt="Mall Image"
-                  className="w-full h-40 object-cover rounded-lg"
+                  className="w-full h-48 object-cover rounded-lg shadow-md hover:scale-105 transition-transform"
                 />
               ))}
             </div>
           </div>
 
           <div className="mt-6">
-            <h2 className="text-xl font-semibold">Rental Agreements</h2>
-            <ul className="mt-2">
+            <h2 className="text-2xl font-semibold mb-2">Rental Agreements</h2>
+            <ul className="space-y-2">
               {mall.agreements.map((agreement) => (
-                <li key={agreement.id} className="mt-1">
+                <li key={agreement.id}>
                   <a
                     href={`${backendURL}${agreement.agreementFile}`}
-                    className="text-blue-600 underline"
+                    className="text-blue-600 underline hover:text-blue-800 transition"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() =>
                       toast.info(`Downloading Agreement ${agreement.id}...`)
                     }
                   >
-                    Download Agreement {agreement.id}
+                    📄 Download Agreement {agreement.id}
                   </a>
                 </li>
               ))}
@@ -123,86 +132,85 @@ function MallInfo() {
           </div>
         </div>
       ) : (
-        <>
-          <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
-            <ToastContainer position="top-right" autoClose={3000} />
-            <h2 className="text-3xl font-bold mb-6 text-center">
-              Mall Information
-            </h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-              <div className="flex flex-col">
-                <label className="font-semibold mb-1">
-                  Number of Basements:
-                </label>
-                <input
-                  type="number"
-                  value={basementCount}
-                  onChange={(e) => setBasementCount(Number(e.target.value))}
-                  className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-900"
-                  min="0"
-                />
-              </div>
+        <div>
+          <ToastContainer position="top-right" autoClose={3000} />
+          <h2 className="text-3xl font-bold text-center mb-6 text-cyan-900">
+            Mall Information
+          </h2>
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <div className="flex flex-col">
+              <label className="font-semibold mb-2">Number of Basements:</label>
+              <input
+                type="number"
+                value={basementCount}
+                onChange={(e) => setBasementCount(Number(e.target.value))}
+                className="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-700"
+                min="0"
+              />
+            </div>
 
-              <div className="flex flex-col">
-                <label className="font-semibold mb-1">Number of Floors:</label>
-                <input
-                  type="number"
-                  value={floorCount}
-                  onChange={(e) => setFloorCount(Number(e.target.value))}
-                  className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-                  min="1"
-                  required
-                />
-              </div>
+            <div className="flex flex-col">
+              <label className="font-semibold mb-2">Number of Floors:</label>
+              <input
+                type="number"
+                value={floorCount}
+                onChange={(e) => setFloorCount(Number(e.target.value))}
+                className="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-700"
+                min="1"
+                required
+              />
+            </div>
 
-              <div className="flex flex-col">
-                <label className="font-semibold mb-1">Number of Rooms:</label>
-                <input
-                  type="number"
-                  value={roomCount}
-                  onChange={(e) => setRoomCount(Number(e.target.value))}
-                  className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-                  min="1"
-                  required
-                />
-              </div>
+            <div className="flex flex-col">
+              <label className="font-semibold mb-2">Number of Rooms:</label>
+              <input
+                type="number"
+                value={roomCount}
+                onChange={(e) => setRoomCount(Number(e.target.value))}
+                className="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-700"
+                min="1"
+                required
+              />
+            </div>
 
-              <div className="flex flex-col">
-                <label className="font-semibold mb-1">Price Per Care:</label>
-                <input
-                  type="number"
-                  value={pricePerCare}
-                  onChange={(e) => setPricePerCare(Number(e.target.value))}
-                  className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
+            <div className="flex flex-col">
+              <label className="font-semibold mb-2">Price Per Care:</label>
+              <input
+                type="number"
+                value={pricePerCare}
+                onChange={(e) => setPricePerCare(Number(e.target.value))}
+                className="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-700"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
 
-              <div className="flex flex-col col-span-2">
-                <label className="font-semibold mb-1">Upload Agreement:</label>
-                <input
-                  id="agreementFileInput"
-                  type="file"
-                  onChange={handleFileChange}
-                  className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-700"
-                  accept=".pdf,.doc,.docx"
-                  required
-                />
-              </div>
+            <div className="flex flex-col md:col-span-2">
+              <label className="font-semibold mb-2">Upload Agreement:</label>
+              <input
+                id="agreementFileInput"
+                type="file"
+                onChange={handleFileChange}
+                className="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-700"
+                accept=".pdf,.doc,.docx"
+                required
+              />
+            </div>
 
-              <div className="col-span-2 text-center">
-                <button
-                  type="submit"
-                  className="bg-cyan-700 text-white px-6 py-3 rounded-lg hover:bg-cyan-900 font-semibold transition"
-                >
-                  Save Information
-                </button>
-              </div>
-            </form>
-          </div>
-        </>
+            <div className="md:col-span-2 text-center">
+              <button
+                type="submit"
+                className="bg-cyan-700 text-white px-8 py-3 rounded-lg hover:bg-cyan-900 font-semibold transition-all shadow-md hover:shadow-lg"
+              >
+                💾 Save Information
+              </button>
+            </div>
+          </form>
+        </div>
       )}
     </div>
   );

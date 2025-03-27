@@ -86,10 +86,21 @@ export default function RegisterMall() {
         });
       } else {
         console.error("Mall registration failed!");
-        toast.error("Mall registration failed!");
+        toast.error(
+          error.response?.data?.message ||
+            error.response?.data ||
+            error.message ||
+            "Mall registration failed!"
+        );
       }
     } catch (error) {
       console.error(error.message || "Mall registration failed!");
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data ||
+          error.message ||
+          "Mall registration failed!"
+      );
     }
   };
 
