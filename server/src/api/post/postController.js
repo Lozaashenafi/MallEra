@@ -29,6 +29,7 @@ export const addPosts = async (req, res) => {
       description,
       price,
       bidDeposit,
+      bidEndDate,
       userId,
       status,
     } = req.body;
@@ -51,8 +52,9 @@ export const addPosts = async (req, res) => {
         description,
         price: price ? parseFloat(price) : null,
         bidDeposit: bidDeposit ? parseFloat(bidDeposit) : null,
+        bidEndDate: bidEndDate ? new Date(bidEndDate) : null,
         userId: Number(userId),
-        status: status || "PENDING",
+        status: status || "APPROVED",
       },
     });
 

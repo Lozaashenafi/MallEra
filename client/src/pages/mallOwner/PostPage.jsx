@@ -3,6 +3,7 @@ import { FiUpload, FiImage, FiX } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { addPost } from "../../api/post";
 import { getAvailableRooms } from "../../api/room";
+import { toast } from "react-toastify";
 
 function PostPage() {
   const [isBid, setIsBid] = useState(false);
@@ -14,9 +15,12 @@ function PostPage() {
   const [images, setImages] = useState([]);
   const [price, setPrice] = useState("");
   const [bidDeposit, setBidDeposit] = useState("");
+  const [bidEndDate, setBidEndDate] = useState(""); // New state for bid end date
   const { userData } = useAuth();
+
   // Fetch available rooms when mallId changes
   useEffect(() => {
+    setMallId(userData.mallId);
     if (mallId) {
       fetchAvailableRooms(mallId);
     }
@@ -42,7 +46,6 @@ function PostPage() {
     const newImages = files.map((file) => URL.createObjectURL(file));
     setImages([...images, ...newImages]);
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -52,9 +55,14 @@ function PostPage() {
     formData.append("title", title);
     formData.append("description", description);
     formData.append("price", price);
-    formData.append("bidDeposit", isBid ? bidDeposit : null);
-    formData.append("userId", userData?.id);
+    formData.append("userId", userData?.userId);
     formData.append("status", "PENDING");
+
+    // Conditionally append bid-related data if isBid is true
+    if (isBid) {
+      formData.append("bidDeposit", bidDeposit ? Number(bidDeposit) : 0);
+      formData.append("bidEndDate", bidEndDate);
+    }
 
     // Append images to FormData
     for (let i = 0; i < images.length; i++) {
@@ -63,10 +71,26 @@ function PostPage() {
       const file = new File([blob], `image-${i}.jpg`, { type: "image/jpeg" });
       formData.append("images", file);
     }
+
     try {
       const response = await addPost(formData);
-      console.log("Post created successfully:", response);
+      toast.success(response.message || "Post created successfully:");
+
+      // Reset form fields after success
+      setTitle("");
+      setDescription("");
+      setPrice("");
+      setBidDeposit("");
+      setBidEndDate("");
+      setIsBid(false);
+      setSelectedRoom("");
+      setImages([]);
     } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || // Extract from response data
+        error.message || // Fallback to Axios error message
+        "Failed to save post. Please try again.";
+      toast.error(errorMessage);
       console.error("Error creating post:", error.message);
     }
   };
@@ -116,21 +140,7 @@ function PostPage() {
             <option value="">Select Available Room</option>
             {rooms.map((room) => (
               <option key={room.id} value={room.id}>
-                Room {room.roomNumber} (Floor {room.floor})
-              </option>
-            ))}
-          </select>
-          {/* Rooms Dropdown (Fetches based on Mall ID) */}
-          <select
-            value={selectedRoom}
-            onChange={(e) => setSelectedRoom(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            required
-          >
-            <option value="">Select Available Room</option>
-            {rooms.map((room) => (
-              <option key={room.id} value={room.id}>
-                {room.name} (Floor {room.floor})
+                Room {room.roomNumber}
               </option>
             ))}
           </select>
@@ -167,14 +177,25 @@ function PostPage() {
 
           {/* Bid Deposit Input (Only if Bid is selected) */}
           {isBid && (
-            <input
-              type="number"
-              placeholder="Bid Deposit"
-              value={bidDeposit}
-              onChange={(e) => setBidDeposit(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              required
-            />
+            <>
+              <input
+                type="number"
+                placeholder="Bid Deposit"
+                value={bidDeposit}
+                onChange={(e) => setBidDeposit(e.target.value)}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+
+              {/* Bid End Date */}
+              <input
+                type="date"
+                value={bidEndDate}
+                onChange={(e) => setBidEndDate(e.target.value)}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+              />
+            </>
           )}
         </div>
 

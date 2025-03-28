@@ -113,6 +113,7 @@ model Post {
   description String?
   price       Float?
   bidDeposit  Float?
+  bidEndDate  DateTime?
   userId      Int
   status      PostStatus  @default(PENDING)
   createdAt   DateTime    @default(now())
