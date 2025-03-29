@@ -81,6 +81,9 @@ export const uploadPostImages = upload.array("images", 3); // Max 3 images
 export const getPosts = async (req, res) => {
   try {
     const posts = await prisma.post.findMany({
+      where: {
+        status: "PENDING",
+      },
       include: { room: true },
     });
     res.json(posts);
@@ -88,16 +91,33 @@ export const getPosts = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch posts" });
   }
 };
+
 export const postDetail = async (req, res) => {
   try {
     const { id } = req.params;
     const post = await prisma.post.findUnique({
       where: { id: parseInt(id) },
-      include: { user: true, mall: true, room: true, bids: true, images: true },
+      include: {
+        user: true,
+        mall: true, // This will fetch the associated mall for the post
+        room: true, // Fetch room information for the post
+        bids: true, // Fetch bids associated with the post
+        images: {
+          // Fetch images associated with the post
+          select: {
+            imageURL: true, // Adjust based on your field name in the PostImage model
+          },
+        },
+      },
     });
-    if (!post) return res.status(404).json({ error: "Post not found" });
-    res.json(post);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json(post); // Returning the complete post data including mall, room, and images
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch post" });
   }
 };
