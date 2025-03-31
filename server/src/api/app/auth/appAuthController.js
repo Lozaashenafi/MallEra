@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../../../config/prismaClient.js";
 import authSchema from "./appAuthSchema.js";
-
 // Register Admin
 export const register = async (req, res) => {
   try {
@@ -11,7 +10,8 @@ export const register = async (req, res) => {
     if (error)
       return res.status(400).json({ message: error.details[0].message });
 
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, phoneNumber } = req.body;
+    console.log(fullName, email, password, phoneNumber);
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -28,6 +28,7 @@ export const register = async (req, res) => {
         username: email, // Using email as username
         email,
         password: hashedPassword,
+        phoneNumber,
         role: "USER",
         status: "ACTIVE",
       },
@@ -35,7 +36,7 @@ export const register = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "user registered successfully", userId: user.id });
+      .json({ message: "User registered successfully", userId: user.id });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -47,10 +48,15 @@ export const login = async (req, res) => {
     if (error)
       return res.status(400).json({ message: error.details[0].message });
 
-    const { email, password } = req.body;
+    const { emailOrPhone, password } = req.body;
 
-    // Find the user by email
-    const user = await prisma.user.findUnique({ where: { email } });
+    // Find the user by email or phone number
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: emailOrPhone }, { phoneNumber: emailOrPhone }],
+      },
+    });
+
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     // Check if user is an ADMIN or MALL_OWNER
@@ -64,7 +70,7 @@ export const login = async (req, res) => {
         .status(401)
         .json({ message: "Invalid credentials", success: false });
 
-    // Generate JWT token with mallName only for MALL_OWNER
+    // Generate JWT token
     const tokenPayload = {
       userId: user.id,
       mallId: user.mallId,
