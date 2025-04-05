@@ -30,18 +30,18 @@ function RoomPrice() {
   }, [userData.mallId]);
 
   const handleUpdatePricePerCare = async () => {
-    if (!selectedFloor || !newPrice) {
+    if (!selectedFloor || !currentPrice) {
       toast.error("Please select a floor and enter a price.");
       return;
     }
     try {
       const response = await updatePricePerCare({
         floorId: selectedFloor,
-        price: parseFloat(newPrice),
+        price: parseFloat(currentPrice),
         mallId: userData.mallId,
       });
       toast.success(response.message || "Price updated successfully!");
-      setCurrentPrice(newPrice); // Update UI after successful update
+      setCurrentPrice(currentPrice); // Update UI after successful update
     } catch (error) {
       console.error("Error updating price:", error);
       toast.error(
@@ -99,11 +99,11 @@ function RoomPrice() {
             </select>
           </div>
 
-          <label className="block text-cyan-600 mt-4">New Price</label>
+          <label className="block text-cyan-600 mt-4">Price per care</label>
           <input
             type="number"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
+            value={currentPrice}
+            onChange={(e) => setCurrentPrice(e.target.value)}
             className="w-full bg-gray-200 text-black p-2 mt-1 rounded focus:outline-none border border-gray-300"
           />
 

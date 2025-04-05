@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
 import {
   FiBell,
   FiCheckCircle,
@@ -7,62 +9,95 @@ import {
   FiTag,
   FiClipboard,
 } from "react-icons/fi";
+import api from "../../utils/api";
 
-function NotificationPage() {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "request",
-      message: "New shop request from XYZ Retail.",
-      read: false,
-    },
-    {
-      id: 2,
-      type: "bid",
-      message: "New lease bid from ABC Stores.",
-      read: false,
-    },
-    {
-      id: 3,
-      type: "payment",
-      message: "Rent payment received from Store #12.",
-      read: true,
-    },
-    {
-      id: 4,
-      type: "request",
-      message: "Maintenance request submitted.",
-      read: false,
-    },
-    {
-      id: 5,
-      type: "payment",
-      message: "Pending invoice for Store #45.",
-      read: false,
-    },
-  ]);
+const socket = io(import.meta.env.VITE_API_URL);
+
+const NotificationSystem = ({ userId }) => {
+  const [notifications, setNotifications] = useState([]);
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // Fetch notifications from localStorage when component is mounted
+  useEffect(() => {
+    const storedNotifications = localStorage.getItem("notifications");
+    if (storedNotifications) {
+      setNotifications(JSON.parse(storedNotifications));
+    }
+
+    if (userId) {
+      socket.emit("registerUser", userId);
+    }
+
+    socket.on("newRequest", (data) => {
+      setNotifications((prev) => {
+        const newNotifications = [
+          ...prev,
+          {
+            id: data.id,
+            type: "request",
+            message: data.message,
+            user: data.user,
+            read: false,
+          },
+        ];
+        // Store notifications in localStorage
+        localStorage.setItem("notifications", JSON.stringify(newNotifications));
+        return newNotifications;
+      });
+    });
+
+    return () => {
+      socket.off("newRequest");
+    };
+  }, [userId]);
 
   const markAsRead = (id) => {
     setNotifications((prev) =>
-      prev.map((notif) => (notif.id === id ? { ...notif, read: true } : notif))
+      prev.map((notif) => {
+        if (notif.id === id) {
+          const updatedNotif = { ...notif, read: true };
+          // Update notifications in localStorage
+          localStorage.setItem(
+            "notifications",
+            JSON.stringify(
+              prev.map((notif) => (notif.id === id ? updatedNotif : notif))
+            )
+          );
+          return updatedNotif;
+        }
+        return notif;
+      })
     );
   };
 
   const deleteNotification = (id) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+    setNotifications((prev) => {
+      const updatedNotifications = prev.filter((notif) => notif.id !== id);
+      // Remove notification from localStorage
+      localStorage.setItem(
+        "notifications",
+        JSON.stringify(updatedNotifications)
+      );
+      return updatedNotifications;
+    });
   };
 
   const getIcon = (type) => {
     switch (type) {
       case "request":
-        return <FiClipboard className="text-blue-500" />;
+        return <FiClipboard className="text-blue-500 w-6 h-6" />;
       case "bid":
-        return <FiTag className="text-purple-500" />;
+        return <FiTag className="text-purple-500 w-6 h-6" />;
       case "payment":
-        return <FiDollarSign className="text-green-500" />;
+        return <FiDollarSign className="text-green-500 w-6 h-6" />;
       default:
-        return <FiBell />;
+        return <FiBell className="w-6 h-6" />;
     }
+  };
+
+  // Handle notification click to navigate to request details
+  const handleNotificationClick = (requestId) => {
+    navigate(`/request/${requestId}`); // Navigate to request details page
   };
 
   return (
@@ -81,6 +116,7 @@ function NotificationPage() {
               className={`flex items-center justify-between p-3 border rounded-lg ${
                 notif.read ? "bg-gray-100" : "bg-cyan-50"
               }`}
+              onClick={() => handleNotificationClick(notif.id)} // Add click handler here
             >
               <div className="flex items-center gap-3">
                 {getIcon(notif.type)}
@@ -89,7 +125,10 @@ function NotificationPage() {
                     notif.read ? "text-gray-500" : "text-gray-800 font-semibold"
                   }`}
                 >
-                  {notif.message}
+                  {notif.message} -{" "}
+                  <span className="text-sm text-gray-400">
+                    {notif.user.userName}
+                  </span>
                 </span>
               </div>
               <div className="flex space-x-3">
@@ -114,6 +153,6 @@ function NotificationPage() {
       )}
     </div>
   );
-}
+};
 
-export default NotificationPage;
+export default NotificationSystem;

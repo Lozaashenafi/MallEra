@@ -31,6 +31,10 @@ import RentManagement from "./pages/mallOwner/RentManagement";
 import ProfilePage from "./pages/mallOwner/ProfilePage";
 import NotificationPage from "./pages/mallOwner/NotificationPage";
 import OwnerSettings from "./pages/mallOwner/OwnerSettings";
+import Requests from "./pages/mallOwner/Requests";
+import PostList from "./pages/mallOwner/PostList";
+import PostDetail from "./pages/mallOwner/PostDetail";
+import AcceptRequest from "./pages/mallOwner/AcceptRequest";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
@@ -72,11 +76,18 @@ function App() {
             <Route path="room/price" element={<RoomPrice />} />
             <Route path="payment" element={<Payment />} />
             <Route path="post" element={<PostPage />} />
+            <Route path="post/list" element={<PostList />} />
+            <Route path="post/list/:id" element={<PostDetail />} />
             <Route path="tenant" element={<TenantManagement />} />
             <Route path="rent" element={<RentManagement />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="notifications" element={<NotificationPage />} />
+            <Route
+              path="notifications"
+              element={<NotificationPage userId={userData.userId} />}
+            />
             <Route path="settings" element={<OwnerSettings />} />
+            <Route path="requests/:postId" element={<Requests />} />
+            <Route path="requests/accept/:id" element={<AcceptRequest />} />
           </Route>
         )}
       </Routes>

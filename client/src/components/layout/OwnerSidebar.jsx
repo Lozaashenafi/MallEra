@@ -7,6 +7,7 @@ import {
   FiSettings,
   FiChevronDown,
   FiInfo,
+  FiClipboard,
 } from "react-icons/fi";
 import { MdMeetingRoom } from "react-icons/md";
 import { useAuth } from "../../context/AuthContext";
@@ -50,6 +51,11 @@ function OwnerSidebar() {
           label="Manage Tenant"
         />
         <SidebarLink to="/owner/rent" icon={<FiUsers />} label="Manage Rent" />
+        <SidebarLink
+          to="/owner/Post/list"
+          icon={<FiClipboard />}
+          label="Posts"
+        />
         <SidebarLink
           to="/owner/payment"
           icon={<FiDollarSign />}

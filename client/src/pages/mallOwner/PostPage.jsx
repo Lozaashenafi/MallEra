@@ -3,7 +3,7 @@ import { FiUpload, FiImage, FiX } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { addPost } from "../../api/post";
 import { getAvailableRooms } from "../../api/room";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 function PostPage() {
   const [isBid, setIsBid] = useState(false);
@@ -100,7 +100,7 @@ function PostPage() {
       <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
         Create a Post
       </h2>
-
+      <ToastContainer />
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-4">

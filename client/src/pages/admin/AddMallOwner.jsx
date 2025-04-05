@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getMall } from "../../api/mall";
 import { ownerRegister } from "../../api/mall";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function AddMallOwner() {
@@ -55,7 +55,7 @@ function AddMallOwner() {
 
     try {
       const response = await ownerRegister(formData);
-      toast.success("Mall Owner registered successfully!"); // Show success toast
+      toast.success(response.message || "Mall Owner registered successfully!"); // Show success toast
       console.log("Owner Registered: ", response);
 
       // Reset form data after successful registration
@@ -79,6 +79,7 @@ function AddMallOwner() {
 
   return (
     <section className="mt-6">
+      <ToastContainer />
       <h1 className="text-2xl font-bold text-gray-800">Add Mall Owner</h1>
       <div className="mt-6 p-6 bg-white shadow-lg rounded-lg max-w-2xl mx-auto">
         <form
