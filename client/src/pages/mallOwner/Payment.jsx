@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { createPayment, getPayments } from "../../api/payment";
 import { getRents } from "../../api/rent";
+import FirstPayment from "../../components/mallOwner/FirstPayment";
 
 export default function Payment() {
   const [rents, setRents] = useState([]);
@@ -95,7 +96,9 @@ export default function Payment() {
           </button>
         </form>
       </div>
-      <div className="bg-white p-6 rounded-2xl shadow-md w-1/2 border border-gray-300"></div>
+      <div className="bg-white p-6 rounded-2xl shadow-md w-1/2 border border-gray-300">
+        <FirstPayment />
+      </div>
     </div>
   );
 }

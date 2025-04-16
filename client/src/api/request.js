@@ -2,10 +2,10 @@ import API from "../utils/api";
 export const getPostRequests = async (postId) => {
   try {
     const response = await API.get(`/owner/request/${postId}`);
-    console.log("Fetched posts:", response.data); // Ensure this logs an array
+    // console.log("Fetched posts:", response.data); // Ensure this logs an array
     return response.data; // Default to an empty array
   } catch (error) {
-    console.error("Error fetching posts:", error);
+    // console.error("Error fetching posts:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch requests"
     );

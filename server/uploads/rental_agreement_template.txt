@@ -1,0 +1,24 @@
+RENTAL AGREEMENT
+This Rental Agreement ("Agreement") is made and entered into on {agreement_date} by and between:
+Landlord: {landlord_name}
+Phone Number: {landlord_address}
+Tenant: {tenant_name}
+Phone Number: {tenant_address}
+1. Property Details
+The Landlord agrees to rent the property located at:
+Property Address: {property_address}
+2. Term of Lease
+The lease shall begin on {lease_start_date} and end on {lease_end_date}, unless renewed or terminated as per the terms of this agreement.
+3. Rent Payment
+The Tenant agrees to pay rent of ${rent_amount} per month, due on the {rent_due_date} of each month. Payment shall be made via {payment_method}.
+4. Security Deposit
+The Tenant shall pay a security deposit of ${security_deposit} before moving in. This deposit will be returned at the end of the lease, subject to any deductions for damages or unpaid rent.
+5. Maintenance and Repairs
+• The Tenant is responsible for keeping the property clean and reporting any necessary repairs.
+• The Landlord will handle major repairs not caused by the Tenant's negligence.
+Termination of Lease
+Either party may terminate the lease with {notice_period} days' written notice. Early termination may result in penalties as per the agreement.
+Signatures
+By signing below, both parties agree to the terms of this Rental Agreement.
+Landlord Signature: _______________ Date: _______________
+Tenant Signature: _______________ Date: {agreement_date}

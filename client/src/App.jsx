@@ -35,6 +35,11 @@ import Requests from "./pages/mallOwner/Requests";
 import PostList from "./pages/mallOwner/PostList";
 import PostDetail from "./pages/mallOwner/PostDetail";
 import AcceptRequest from "./pages/mallOwner/AcceptRequest";
+import Malls from "./pages/public/malls";
+import Register from "./pages/public/Register";
+import PendingMall from "./pages/admin/PendingMall";
+import Bids from "./pages/mallOwner/Bids";
+import AcceptBid from "./pages/mallOwner/AcceptBid";
 
 function App() {
   const { isLoggedIn, isAdmin, isOwner, userData } = useAuth();
@@ -52,6 +57,8 @@ function App() {
           <Route path="contact" element={<ContactUs />} />
           <Route path="login" element={<LogIn />} />
           <Route path="signup" element={<SignUp />} />
+          <Route path="malls" element={<Malls />} />
+          <Route path="register" element={<Register />} />
         </Route>
 
         {isAdmin && (
@@ -64,6 +71,7 @@ function App() {
             <Route path="mall/detail/:id" element={<MallDetail />} />
             <Route path="malls/update/:id" element={<UpdateMall />} />
             <Route path="malls/register" element={<RegisterMall />} />
+            <Route path="pending/malls" element={<PendingMall />} />
           </Route>
         )}
 
@@ -88,6 +96,8 @@ function App() {
             <Route path="settings" element={<OwnerSettings />} />
             <Route path="requests/:postId" element={<Requests />} />
             <Route path="requests/accept/:id" element={<AcceptRequest />} />
+            <Route path="bid/accept/:id" element={<AcceptBid />} />
+            <Route path="bid/:postId" element={<Bids />} />
           </Route>
         )}
       </Routes>

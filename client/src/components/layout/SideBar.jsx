@@ -6,6 +6,7 @@ function SideBar() {
     { name: "Dashboard", path: "/admin" },
     { name: "Mall Owner Management", path: "/admin/mall-owners" },
     { name: "Mall Management", path: "/admin/malls" },
+    { name: "Mall  Requests", path: "/admin/pending/malls" },
     { name: "System Settings", path: "/admin/settings" },
   ];
 

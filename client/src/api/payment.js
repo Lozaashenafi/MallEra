@@ -28,3 +28,13 @@ export const createPayment = async (payment) => {
     throw new Error(error.response?.data?.message || "Payment failed");
   }
 };
+export const getFirstPayments = async (mallId) => {
+  try {
+    const response = await API.get(`/payment/getfirstpay/${mallId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch first payments"
+    );
+  }
+};

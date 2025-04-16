@@ -16,7 +16,7 @@ function Header() {
           <Link to="/about">About Us</Link>
         </li>
         <li className="hover:text-red-600 cursor-pointer">
-          <Link to="/mall">Mall</Link>
+          <Link to="/malls">Mall</Link>
         </li>
         <li className="hover:text-red-600 cursor-pointer">
           <Link to="/contact">Contact Us</Link>
@@ -27,10 +27,10 @@ function Header() {
           Login
         </Link>
         <Link
-          to="/signup"
+          to="/register"
           className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
         >
-          Sign up
+          Register
         </Link>
       </div>
     </nav>

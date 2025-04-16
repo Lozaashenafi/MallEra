@@ -86,21 +86,19 @@ function PostDetail() {
 
       {/* Action Buttons */}
       <div className="mt-6">
-        {status === "PENDING" && (
-          <Link
-            to={`/owner/requests/${id}`}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Request
-          </Link>
-        )}
-
-        {status === "INVISIBLE" && (
+        {bidDeposit ? (
           <Link
             to={`/owner/bid/${id}`}
             className="bg-green-500 text-white px-4 py-2 rounded"
           >
             Bid
+          </Link>
+        ) : (
+          <Link
+            to={`/owner/requests/${id}`}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Request
           </Link>
         )}
       </div>

@@ -10,11 +10,37 @@ export const mallInfo = async (mallData) => {
     throw error;
   }
 };
+export const approveMall = async (mallId) => {
+  try {
+    const response = await API.post(`/mall/approve`, { mallId });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const pendingMall = async () => {
+  try {
+    const response = await API.get("/mall/pending");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 // Register Mall
 export const registerMall = async (mallData) => {
   console.log(mallData);
   try {
     const response = await API.post("/mall/register", mallData);
+    console.log("API Response in registerMall:", response.data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const registerMallByItself = async (mallData) => {
+  console.log(mallData);
+  try {
+    const response = await API.post("/mall/register/me", mallData);
     console.log("API Response in registerMall:", response.data);
     return response.data;
   } catch (error) {

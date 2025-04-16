@@ -27,7 +27,7 @@ export default function Requests() {
         const response = await getPostRequests(postId); // Log the response data
         setRequests(response);
       } catch (err) {
-        console.error("Error fetching requests:", err); // Log the actual error
+        // console.error("Error fetching requests:", err); // Log the actual error
         setError("Failed to fetch requests.");
       } finally {
         setLoading(false);
@@ -44,13 +44,15 @@ export default function Requests() {
   const handleDecline = async (id) => {
     const response = await declineRequest(id);
     toast.success(response.message); // Show the toast notification
-    console.log("decline", response);
+    // console.log("decline", response);
     setOpenDetail(false);
 
     // Reload the page after showing the toast
     window.location.reload();
   };
-
+  if (!requests.length) {
+    return <p className="text-center text-gray-500">No requests available.</p>;
+  }
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 

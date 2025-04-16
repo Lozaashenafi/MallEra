@@ -9,6 +9,9 @@ import appAuthRoute from "../api/app/auth/appAuthRoute.js";
 import postRoute from "../api/post/postRoute.js";
 import requestRoute from "../api/app/request/requestRoute.js";
 import requestOwnerRoute from "../api/request/requestOwnerRoute.js";
+import bidRoute from "../api/app/bid/bidRoute.js";
+import bidOwnerRoute from "../api/bid/bidOwnerRoute.js";
+import notificationRoute from "../api/notifications/notificationRoute.js";
 const router = express.Router();
 
 // Auth routes
@@ -22,5 +25,8 @@ router.use("/payment", paymentRoute);
 router.use("/post", postRoute);
 router.use("/request", requestRoute);
 router.use("/owner/request", requestOwnerRoute);
+router.use("/bid", bidRoute);
+router.use("/owner/bid", bidOwnerRoute);
+router.use("/notification", notificationRoute);
 
 export default router;
