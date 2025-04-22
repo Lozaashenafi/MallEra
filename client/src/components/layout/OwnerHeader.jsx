@@ -14,7 +14,7 @@ function OwnerHeader() {
   };
 
   return (
-    <header className="flex justify-between items-center bg-white shadow-md p-4 rounded-lg">
+    <header className="fixed top-0 left-64 right-0 z-50 bg-white shadow-md p-4 flex justify-between items-center">
       {/* Search Bar */}
       <input
         type="text"

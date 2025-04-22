@@ -111,8 +111,7 @@ export default function Requests() {
             </div>
           </DialogContent>
           <DialogActions>
-            {/* Conditionally render buttons based on status */}
-            {selectedRequest.status !== "DECLINED" && (
+            {selectedRequest.status == "PENDING" && (
               <>
                 <Link
                   onClick={() => handleDecline(selectedRequest.id)}

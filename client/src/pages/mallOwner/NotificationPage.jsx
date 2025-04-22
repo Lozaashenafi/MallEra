@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
 import {
   FiBell,
@@ -9,13 +8,36 @@ import {
   FiTag,
   FiClipboard,
 } from "react-icons/fi";
-import api from "../../utils/api";
-
-const socket = io(import.meta.env.VITE_API_URL);
+import socket from "../../utils/socket";
 
 const NotificationSystem = ({ userId }) => {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
+
+  useEffect(() => {
+    if (!userId) return;
+
+    socket.connect();
+    console.log("🔌 Connecting socket...");
+
+    socket.on("connect", () => {
+      console.log("✅ Socket connected:", socket.id);
+
+      const roomId = `user-${userId}`;
+      socket.emit("registerUser", roomId);
+      console.log(`📡 Registered as ${roomId}`);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("❌ Socket disconnected");
+    });
+
+    return () => {
+      socket.disconnect();
+      socket.off("connect");
+      socket.off("disconnect");
+    };
+  }, [userId]);
 
   // Fetch notifications from localStorage when component is mounted
   useEffect(() => {
@@ -28,26 +50,29 @@ const NotificationSystem = ({ userId }) => {
       socket.emit("registerUser", userId);
     }
 
-    socket.on("newRequest", (data) => {
+    const handleNewNotification = (type) => (data) => {
       setNotifications((prev) => {
         const newNotifications = [
           ...prev,
           {
             id: data.id,
-            type: "request",
+            type: type,
             message: data.message,
             user: data.user,
             read: false,
           },
         ];
-        // Store notifications in localStorage
         localStorage.setItem("notifications", JSON.stringify(newNotifications));
         return newNotifications;
       });
-    });
+    };
+
+    socket.on("newRequest", handleNewNotification("request"));
+    socket.on("newBid", handleNewNotification("bid"));
 
     return () => {
       socket.off("newRequest");
+      socket.off("newBid"); // clean this too
     };
   }, [userId]);
 
@@ -95,15 +120,16 @@ const NotificationSystem = ({ userId }) => {
     }
   };
 
-  // Handle notification click to navigate to request details
-  const handleNotificationClick = (requestId) => {
-    navigate(`/request/${requestId}`); // Navigate to request details page
+  // Prevent navigating to the notification detail page
+  const handleNotificationClick = (event) => {
+    event.stopPropagation(); // Prevent click event from propagating
   };
 
   return (
     <div className="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md mt-6">
       <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-        <FiBell /> Mall Owner Notifications
+        <FiBell />
+        Notifications
       </h2>
 
       {notifications.length === 0 ? (
@@ -116,7 +142,7 @@ const NotificationSystem = ({ userId }) => {
               className={`flex items-center justify-between p-3 border rounded-lg ${
                 notif.read ? "bg-gray-100" : "bg-cyan-50"
               }`}
-              onClick={() => handleNotificationClick(notif.id)} // Add click handler here
+              onClick={handleNotificationClick} // Add the click handler here
             >
               <div className="flex items-center gap-3">
                 {getIcon(notif.type)}
@@ -134,14 +160,20 @@ const NotificationSystem = ({ userId }) => {
               <div className="flex space-x-3">
                 {!notif.read && (
                   <button
-                    onClick={() => markAsRead(notif.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent click propagation
+                      markAsRead(notif.id);
+                    }}
                     className="text-green-600 hover:text-green-800"
                   >
                     <FiCheckCircle />
                   </button>
                 )}
                 <button
-                  onClick={() => deleteNotification(notif.id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent click propagation
+                    deleteNotification(notif.id);
+                  }}
                   className="text-red-600 hover:text-red-800"
                 >
                   <FiTrash2 />

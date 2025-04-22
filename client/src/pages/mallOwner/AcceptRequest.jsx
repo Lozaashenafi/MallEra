@@ -13,9 +13,9 @@ function AcceptRequest() {
     paymentDate: "",
     ownerName: "",
     ownerPhone: "",
-    firstPayment: "",
+    firstpayment: "",
     paymentDuration: "",
-    message: "",
+    note: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -32,9 +32,9 @@ function AcceptRequest() {
       paymentDate,
       ownerName,
       ownerPhone,
-      firstPayment,
+      firstpayment,
       paymentDuration,
-      message,
+      note,
     } = formData;
 
     if (
@@ -42,9 +42,9 @@ function AcceptRequest() {
       !paymentDate ||
       !ownerName ||
       !ownerPhone ||
-      !firstPayment ||
+      !firstpayment ||
       !paymentDuration ||
-      !message
+      !note
     ) {
       toast.error("All fields are required!");
       return;
@@ -53,20 +53,21 @@ function AcceptRequest() {
     setLoading(true);
 
     try {
+      console.log("Form Data:", formData); // Debugging line
       const response = await acceptRequest(formData);
-      toast.success(response.message);
+      toast.success(response.message || "Request accepted successfully!");
 
       setFormData({
         visitDate: "",
         paymentDate: "",
         ownerName: "",
         ownerPhone: "",
-        firstPayment: "",
+        firstpayment: "",
         paymentDuration: "",
-        message: "",
+        note: "",
       });
     } catch (error) {
-      toast.error(error.response?.message || "Something went wrong!");
+      toast.error(error.response?.note || "Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -143,8 +144,8 @@ function AcceptRequest() {
             </label>
             <input
               type="number"
-              name="firstPayment"
-              value={formData.firstPayment}
+              name="firstpayment"
+              value={formData.firstpayment}
               onChange={handleChange}
               className="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300"
               min="0"
@@ -165,16 +166,16 @@ function AcceptRequest() {
             />
           </div>
 
-          {/* Message Textarea (full width) */}
+          {/* note Textarea (full width) */}
           <div className="col-span-2">
-            <label className="block text-gray-700 font-medium">Message</label>
+            <label className="block text-gray-700 font-medium">Note</label>
             <textarea
-              name="message"
-              value={formData.message}
+              name="note"
+              value={formData.note}
               onChange={handleChange}
               rows="4"
               className="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-300"
-              placeholder="Enter additional notes or message..."
+              placeholder="Enter additional notes or note..."
             ></textarea>
           </div>
         </div>

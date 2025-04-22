@@ -196,7 +196,7 @@ function MallInfo() {
                 type="file"
                 onChange={handleFileChange}
                 className="border p-3 rounded-lg focus:ring-2 focus:ring-cyan-700"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf,.doc,.docx,.txt"
                 required
               />
             </div>

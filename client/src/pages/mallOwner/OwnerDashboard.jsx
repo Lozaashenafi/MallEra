@@ -1,40 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
   LineChart,
   Line,
-  PieChart,
-  Pie,
-  Cell,
+  PieChart, // <-- Add this import
+  Pie, // <-- Add this import
+  Cell, // <-- Add this import
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
 import { Users, ShoppingBag, DollarSign, TrendingUp } from "lucide-react";
-
-const randomData = (length, min, max) =>
-  Array.from({ length }, () => ({
-    value: Math.floor(Math.random() * (max - min + 1)) + min,
-  }));
-
-const barData = randomData(7, 100, 500).map((d, i) => ({
-  name: `Day ${i + 1}`,
-  sales: d.value,
-}));
-const lineData = randomData(7, 2000, 10000).map((d, i) => ({
-  name: `Week ${i + 1}`,
-  revenue: d.value,
-}));
-const pieData = [
-  { name: "Malls", value: 10 },
-  { name: "Tenants", value: 50 },
-  { name: "Users", value: 150 },
-];
-const colors = ["#4CAF50", "#FF9800", "#2196F3"];
+import { getDashboard } from "../../api/dashboard";
+import { useAuth } from "../../context/AuthContext";
 
 export default function OwnerDashboard() {
+  const [dashboardData, setDashboardData] = useState({
+    postCount: 0,
+    tenantCount: 0,
+    totalRevenue: 0,
+    growthRate: 0,
+    yearlyRevenue: [],
+    rentGrowthRate: [],
+  });
+
+  const pieData = [
+    { name: "Occupied", value: dashboardData.occupancyPercent },
+    { name: "Available", value: dashboardData.availabilityPercent },
+  ];
+  const colors = ["#FF5722", "#4CAF50"];
+  const { userData } = useAuth(); // Assuming you need this for authentication context
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getDashboard(userData.mallId); // replace with actual mallId
+        setDashboardData(data);
+      } catch (error) {
+        console.error("Failed to load dashboard:", error);
+      }
+    };
+    fetchData();
+  }, [userData.mallId]);
+
+  // Prepare Rent Overview Bar Chart data
+  const rentData = dashboardData.yearlyRevenue.map((year) => ({
+    year: year.year,
+    rent: year.rent,
+    total: year.total,
+  }));
+
+  // Prepare Rent Growth Line Chart data
+  const rentGrowthData = dashboardData.rentGrowthRate.map((growth) => ({
+    year: growth.year,
+    rentAmount: growth.rentAmount,
+    growthRate: parseFloat(growth.growthRate),
+  }));
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Owner Dashboard</h1>
@@ -42,23 +66,23 @@ export default function OwnerDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         {[
           {
-            title: "Total Users",
-            value: 350,
+            title: "Total Tenants",
+            value: dashboardData.tenantCount,
             icon: <Users className="text-blue-500 w-10 h-10" />,
           },
           {
-            title: "Total Malls",
-            value: 12,
+            title: "Total Posts",
+            value: dashboardData.postCount,
             icon: <ShoppingBag className="text-green-500 w-10 h-10" />,
           },
           {
             title: "Revenue",
-            value: "$25,600",
+            value: `$${dashboardData.totalRevenue.toLocaleString()}`,
             icon: <DollarSign className="text-yellow-500 w-10 h-10" />,
           },
           {
             title: "Growth Rate",
-            value: "8.4%",
+            value: `${dashboardData.growthRate}%`,
             icon: <TrendingUp className="text-red-500 w-10 h-10" />,
           },
         ].map((item, idx) => (
@@ -76,29 +100,33 @@ export default function OwnerDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Rent Overview Bar Chart */}
         <div className="p-4 bg-white shadow-lg rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Sales Overview</h2>
+          <h2 className="text-lg font-semibold mb-4">Rent Overview</h2>
           <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={barData}>
-              <XAxis dataKey="name" />
+            <BarChart data={rentData}>
+              <XAxis dataKey="year" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="sales" fill="#4CAF50" barSize={50} />
+              <Bar dataKey="rent" fill="#4CAF50" barSize={50} />
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Rent Growth Line Chart */}
         <div className="p-4 bg-white shadow-lg rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Revenue Growth</h2>
+          <h2 className="text-lg font-semibold mb-4">Rent Growth</h2>
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={lineData}>
-              <XAxis dataKey="name" />
+            <LineChart data={rentGrowthData}>
+              <XAxis dataKey="year" />
               <YAxis />
               <Tooltip />
               <Line
                 type="monotone"
-                dataKey="revenue"
+                dataKey="growthRate"
                 stroke="#FF9800"
                 strokeWidth={2}
+                dot={false}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -115,7 +143,7 @@ export default function OwnerDashboard() {
               cx="50%"
               cy="50%"
               outerRadius={80}
-              label
+              label={({ name, value }) => `${name}: ${value}%`}
             >
               {pieData.map((_, index) => (
                 <Cell
@@ -126,44 +154,12 @@ export default function OwnerDashboard() {
             </Pie>
           </PieChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className="mt-6 p-4 bg-white shadow-lg rounded-lg">
-        <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-        <table className="w-full border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="p-2 border">User</th>
-              <th className="p-2 border">Action</th>
-              <th className="p-2 border">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              {
-                user: "John Doe",
-                action: "Registered Mall",
-                date: "March 5, 2025",
-              },
-              {
-                user: "Jane Smith",
-                action: "Updated Profile",
-                date: "March 6, 2025",
-              },
-              {
-                user: "Bob Johnson",
-                action: "Added Tenant",
-                date: "March 7, 2025",
-              },
-            ].map((item, idx) => (
-              <tr key={idx} className="text-center">
-                <td className="p-2 border">{item.user}</td>
-                <td className="p-2 border">{item.action}</td>
-                <td className="p-2 border">{item.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="mt-4 text-center">
+          <p className="text-gray-700 text-sm">
+            Total Rooms:{" "}
+            <span className="font-semibold">{dashboardData.totalRooms}</span>
+          </p>
+        </div>
       </div>
     </div>
   );
