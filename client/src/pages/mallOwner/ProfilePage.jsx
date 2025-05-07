@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { FiEdit, FiSave, FiCamera } from "react-icons/fi";
-
+import profile from "../../assets/images/profile.jpeg";
+import { useAuth } from "../../context/AuthContext";
 function ProfilePage() {
+  const { userData } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("johndoe@example.com");
-  const [bio, setBio] = useState("Web Developer | React Enthusiast");
-  const [image, setImage] = useState("https://via.placeholder.com/150");
+  const [name, setName] = useState(userData.fullName || "John Doe");
+  const [role, setRole] = useState(userData.role || "Mall Owner");
+  const [image, setImage] = useState(profile);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -24,7 +25,7 @@ function ProfilePage() {
           className="w-full h-full rounded-full object-cover border-4 border-gray-300"
         />
         {isEditing && (
-          <label className="absolute bottom-2 right-2 bg-gray-200 p-2 rounded-full cursor-pointer">
+          <label className="absolute bottom-2 right-2 bg-gray-200 p-2 rounded-full cursor-pointer ">
             <FiCamera />
             <input
               type="file"
@@ -35,7 +36,6 @@ function ProfilePage() {
           </label>
         )}
       </div>
-
       <h2 className="text-2xl font-semibold text-gray-800 mt-4">
         {isEditing ? (
           <input
@@ -48,32 +48,18 @@ function ProfilePage() {
           name
         )}
       </h2>
-
-      <p className="text-gray-600">
+      <p className="text-gray-600 mt-4">
         {isEditing ? (
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="Role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
             className="border p-2 rounded-lg w-full"
           />
         ) : (
-          email
+          role
         )}
       </p>
-
-      <p className="text-gray-500 mt-3">
-        {isEditing ? (
-          <textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="border p-2 rounded-lg w-full"
-          ></textarea>
-        ) : (
-          bio
-        )}
-      </p>
-
       <button
         className="mt-4 bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 transition"
         onClick={() => setIsEditing(!isEditing)}

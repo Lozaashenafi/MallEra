@@ -108,18 +108,17 @@ export default function Bids() {
                 <p>
                   <strong>Note:</strong> {selectedBid.note}
                 </p>
-
                 <p className="mt-2">
                   <strong>Deposits:</strong>
                 </p>
-                {selectedBid.deposits?.map((dep) => (
-                  <div key={dep.id} className="ml-4 text-sm">
-                    <p>
-                      - ${dep.amount} on
-                      {new Date(dep.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                ))}
+                <div className="ml-4 text-sm">
+                  <p>
+                    - ${selectedBid.deposit.amount} on{" "}
+                    {new Date(
+                      selectedBid.deposit.createdAt
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
             </div>
           </DialogContent>

@@ -1,7 +1,13 @@
 import React from "react";
 import img from "../../assets/images/mall.png";
+import { useNavigate } from "react-router-dom";
 
 function Hero() {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/register");
+  };
   return (
     <>
       <section className="flex flex-col lg:flex-row items-center justify-center text-center lg:text-left py-20 px-8 font-serif">
@@ -15,7 +21,10 @@ function Hero() {
           <h1 className="text-4xl font-semibold">
             <span className="text-red-700"> Management</span>
           </h1>
-          <button className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800">
+          <button
+            onClick={handleClick}
+            className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
+          >
             get started
           </button>
         </div>

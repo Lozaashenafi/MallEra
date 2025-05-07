@@ -17,6 +17,7 @@ function PostPage() {
   const [bidDeposit, setBidDeposit] = useState("");
   const [bidEndDate, setBidEndDate] = useState(""); // New state for bid end date
   const { userData } = useAuth();
+  const [needDeposit, setNeedDeposit] = useState(false);
 
   // Fetch available rooms when mallId changes
   useEffect(() => {
@@ -59,9 +60,12 @@ function PostPage() {
     formData.append("status", "PENDING");
 
     // Conditionally append bid-related data if isBid is true
+
     if (isBid) {
-      formData.append("bidDeposit", bidDeposit ? Number(bidDeposit) : 0);
       formData.append("bidEndDate", bidEndDate);
+    }
+    if (needDeposit) {
+      formData.append("bidDeposit", Number(bidDeposit));
     }
 
     // Append images to FormData
@@ -164,6 +168,15 @@ function PostPage() {
             rows="4"
             required
           ></textarea>
+          {/* Show Room Price if a room is selected */}
+          {selectedRoom && (
+            <div className="text-gray-700 font-medium">
+              Room Price:{" "}
+              {rooms.find((room) => room.id === Number(selectedRoom))?.price ??
+                "N/A"}{" "}
+              ETB
+            </div>
+          )}
 
           {/* Price Input */}
           <input
@@ -174,18 +187,45 @@ function PostPage() {
             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
             required
           />
-
-          {/* Bid Deposit Input (Only if Bid is selected) */}
           {isBid && (
             <>
-              <input
-                type="number"
-                placeholder="Bid Deposit"
-                value={bidDeposit}
-                onChange={(e) => setBidDeposit(e.target.value)}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                required
-              />
+              {/* Need Deposit? */}
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="deposit"
+                    value="no"
+                    checked={!needDeposit}
+                    onChange={() => setNeedDeposit(false)}
+                    className="form-radio"
+                  />
+                  <span>No Deposit</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="deposit"
+                    value="yes"
+                    checked={needDeposit}
+                    onChange={() => setNeedDeposit(true)}
+                    className="form-radio"
+                  />
+                  <span>Need Deposit</span>
+                </label>
+              </div>
+
+              {/* Conditionally show bid deposit input */}
+              {needDeposit && (
+                <input
+                  type="number"
+                  placeholder="Bid Deposit"
+                  value={bidDeposit}
+                  onChange={(e) => setBidDeposit(e.target.value)}
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  required={needDeposit}
+                />
+              )}
 
               {/* Bid End Date */}
               <input

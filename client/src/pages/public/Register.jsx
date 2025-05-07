@@ -5,9 +5,6 @@ import { toast, ToastContainer } from "react-toastify";
 import { registerMallByItself } from "../../api/mall"; // Adjusted API call
 import "react-toastify/dist/ReactToastify.css";
 import "leaflet/dist/leaflet.css";
-import { Link } from "react-router-dom";
-
-const backendURL = import.meta.env.VITE_API_URL;
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -26,19 +23,57 @@ export default function Register() {
     invoice: null,
     userFullName: "",
     userEmail: "",
-    userUsername: "",
     userPassword: "",
-    userRole: "MALL_OWNER", // Default role
+    confirmPassword: "",
   });
-
   const handleChange = (e) => {
     setMall({ ...mall, [e.target.name]: e.target.value });
   };
-
   const handleImageChange = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
       setMall({ ...mall, [name]: files[0] });
+    }
+  };
+  const initiateChapaPayment = async ({ fullName, email, amount }) => {
+    try {
+      const response = await fetch(
+        "https://mallspot.awrasacademy.org/api/chapa/initialize",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount,
+            currency: "ETB",
+            email,
+            first_name: fullName,
+            tx_ref: `tx-${Date.now()}`,
+            return_url: "http://localhost:5173/subscription",
+            callback_url: "http://localhost:5173/subscription",
+            customizations: {
+              title: "Test Payment",
+              description: "Testing Chapa payment in frontend",
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to initiate Chapa payment");
+
+      const data = await response.json();
+      if (data.status === "success") {
+        window.location.href = data.data.checkout_url;
+        setTimeout(() => {
+          toast.success("Payment successful. Redirecting...");
+          setStep(5);
+        }, 2000);
+      } else {
+        toast.error("Payment initialization failed");
+      }
+    } catch (err) {
+      toast.error("Error while initiating payment");
     }
   };
 
@@ -93,16 +128,15 @@ export default function Register() {
     }
     const formData = new FormData();
     Object.entries(mall).forEach(([key, value]) => {
-      if (value) formData.append(key, value);
+      if (value && key !== "confirmPassword") {
+        formData.append(key, value);
+      }
     });
 
     try {
       const result = await registerMallByItself(formData);
-      console.log(result);
-
       if (result?.success) {
         toast.success(result.message || "Mall registered successfully!");
-        setStep(6); // Move to the final step
         setMall({
           mallName: "",
           latitude: 9.145,
@@ -117,8 +151,8 @@ export default function Register() {
           invoice: null,
           userFullName: "",
           userEmail: "",
-          userUsername: "",
           userPassword: "",
+          confirmPassword: "",
         });
       } else {
         toast.error(result?.message || "Registration failed.");
@@ -300,65 +334,8 @@ export default function Register() {
           </div>
         )}
 
-        {/* STEP 4 - Invoice Upload */}
-        {step === 4 && (
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="font-medium text-gray-700">Amount to Pay</label>
-              <div className=" mt-1 p-2   bg-gray-100 font-semibold">
-                1000 per year
-              </div>
-            </div>
-
-            <div>
-              <label className="font-medium text-gray-700 mb-2 block">
-                Upload Invoice
-              </label>
-              <div className="w-32 h-32 border-2 border-dashed relative rounded overflow-hidden">
-                <input
-                  type="file"
-                  name="invoice"
-                  accept="image/*"
-                  id="invoice"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-                {mall.invoice && (
-                  <img
-                    src={URL.createObjectURL(mall.invoice)}
-                    alt="Invoice Preview"
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                <label
-                  htmlFor="invoice"
-                  className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white p-1 rounded-full cursor-pointer shadow"
-                >
-                  <Camera className="text-gray-500 w-5 h-5" />
-                </label>
-              </div>
-            </div>
-            <div className="flex justify-between mt-6">
-              <button
-                type="button"
-                onClick={() => setStep(3)}
-                className="bg-gray-300 px-4 py-2 rounded"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(5)}
-                className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* STEP 4 - Mall Owner Info */}
-        {step === 5 && (
+        {step === 4 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Full Name */}
             <div className="flex flex-col">
@@ -430,32 +407,46 @@ export default function Register() {
                 Back
               </button>
               <button
-                type="submit"
-                className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                type="button"
+                onClick={() => setStep(5)}
+                className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
               >
-                Submit
+                Next
               </button>
             </div>
           </div>
         )}
-
-        {/* STEP 5 - Completion */}
-        {step === 6 && (
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-green-600">
-              Your mall registration was successful!
-            </h2>
-            <p className="mt-4">
-              You will be notified by email once your account is activated.
-            </p>
-            <div className="mt-6">
-              <Link
-                type="button"
-                to={"/"}
-                className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+        {step === 5 && (
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="font-medium text-gray-700">Amount to Pay</label>
+              <div className="mt-1 p-2 bg-gray-100 font-semibold">
+                1000 per year
+              </div>
+            </div>
+            <div className="flex flex-col space-y-4">
+              <button
+                type="submit"
+                onClick={() =>
+                  initiateChapaPayment({
+                    fullName: mall.userFullName,
+                    email: mall.userEmail,
+                    amount: 500, // or your desired amount
+                  })
+                }
+                className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition duration-200"
               >
-                Back to Dashboard
-              </Link>
+                Submit and pay Subscription
+              </button>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Back
+              </button>
             </div>
           </div>
         )}

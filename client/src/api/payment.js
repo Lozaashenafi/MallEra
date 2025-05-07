@@ -2,7 +2,7 @@ import API from "../utils/api";
 
 export const getPayments = async (mallId) => {
   try {
-    const response = await API.get(`/payments/${mallId}/list`);
+    const response = await API.get(`/payment/getpayment/${mallId}`);
     return response.data;
   } catch (error) {
     throw new Error(
@@ -22,7 +22,8 @@ export const getPayment = async (paymentId) => {
 };
 export const createPayment = async (payment) => {
   try {
-    const response = await API.post(`/payments/pay`, payment);
+    const response = await API.post(`/payment/pay`, payment);
+    console.log("Payment response:", response.data);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Payment failed");

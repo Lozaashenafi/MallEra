@@ -29,30 +29,37 @@ function LogIn() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
+
+    // Simple frontend validation
+    if (!email || !password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
 
     setLoading(true);
     console.log("login: " + JSON.stringify(formData));
 
     try {
-      const res = await login({ email, password }); // Try to login
-      console.log(res);
+      const res = await login({ email, password });
+
       if (res.success) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("userData", JSON.stringify(res.userData));
         await fetchData();
         setIsLoggedIn(true);
+        toast.success("Logged in successfully!");
       } else {
-        toast.error(
-          error.response?.data?.message ||
-            error.response?.data ||
-            error.message ||
-            "Login failed!"
-        );
-        console.log(res.message);
+        toast.error(res.message || "Login failed!");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -60,8 +67,8 @@ function LogIn() {
         error.response?.data?.message ||
           error.response?.data ||
           error.message ||
-          "Login failed!"
-      ); // Show server error message
+          "Something went wrong. Please try again."
+      );
     }
 
     setLoading(false);
@@ -74,10 +81,10 @@ function LogIn() {
       } else if (isOwner) {
         navigate("/owner");
       } else {
-        navigate("/home"); // Navigate to a default page or home
+        navigate("/home");
       }
     }
-  }, [isLoggedIn, isAdmin, isOwner, navigate]); // Add dependencies to ensure useEffect is triggered when states change
+  }, [isLoggedIn, isAdmin, isOwner, navigate]);
 
   return (
     <>

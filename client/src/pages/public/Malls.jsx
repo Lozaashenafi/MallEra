@@ -1,10 +1,14 @@
+// Malls.jsx
 import React, { useEffect, useState } from "react";
 import { getMall } from "../../api/mall";
+import { useNavigate } from "react-router-dom"; // 👈 Add this
+
 const backendURL = import.meta.env.VITE_API_URL;
 
 const Malls = () => {
   const [malls, setMalls] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // 👈 Initialize navigate
 
   useEffect(() => {
     const fetchMalls = async () => {
@@ -22,9 +26,15 @@ const Malls = () => {
     fetchMalls();
   }, []);
 
+  const handleMallClick = (mallId) => {
+    navigate(`/tenants/${mallId}`); // 👈 Navigate to tenants page with mallId
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <h1 className="text-2xl items-center font-bold text-orange-700 mb-8"></h1>
+      <h1 className="text-2xl items-center font-bold text-orange-700 mb-8">
+        Malls
+      </h1>
 
       {loading ? (
         <div className="text-center text-gray-500 text-lg">
@@ -39,7 +49,8 @@ const Malls = () => {
           {malls.map((mall) => (
             <div
               key={mall.id}
-              className="bg-white shadow-lg rounded-2xl overflow-hidden transition hover:shadow-xl duration-300"
+              onClick={() => handleMallClick(mall.id)}
+              className="bg-white shadow-lg rounded-2xl overflow-hidden transition hover:shadow-xl duration-300 cursor-pointer"
             >
               <img
                 src={`${backendURL}${mall.image}`}

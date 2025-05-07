@@ -1,4 +1,13 @@
 import API from "../utils/api";
+// api/mall.js
+export const registerMallByItself = async (formData) => {
+  try {
+    const response = await API.post("/mall/register/me", formData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message || "Error submitting mall data");
+  }
+};
 
 export const mallInfo = async (mallData) => {
   console.log(mallData);
@@ -37,16 +46,7 @@ export const registerMall = async (mallData) => {
     throw error;
   }
 };
-export const registerMallByItself = async (mallData) => {
-  console.log(mallData);
-  try {
-    const response = await API.post("/mall/register/me", mallData);
-    console.log("API Response in registerMall:", response.data);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+
 export const getMallName = async (mallId) => {
   try {
     const response = await API.get(`/mall/${mallId}`);
@@ -122,7 +122,7 @@ export const ownerRegister = async (userData) => {
 // Delete Mall
 export const deleteMall = async (mallId) => {
   try {
-    const response = await API.delete(`/malls/${mallId}`);
+    const response = await API.delete(`/mall/disable/${mallId}`);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Mall deletion failed");
@@ -137,6 +137,17 @@ export const updatePricePerCare = async (priceData) => {
   } catch (error) {
     throw new Error(
       error.response?.data?.message || "Failed to update price per care"
+    );
+  }
+};
+export const disableMall = async (mallId) => {
+  try {
+    const response = await API.get(`/mall/disable/${mallId}`);
+    console.log("Mall disabled successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch price per care"
     );
   }
 };

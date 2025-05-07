@@ -39,6 +39,7 @@ enum NotificationType {
   REQUEST
   MESSAGE
   SYSTEM
+  PAYMENT
   ALERT
 }
 
@@ -113,6 +114,7 @@ model Mall {
   invoice   Invoice[]
   Rent Rent[]
   acceptedUser AcceptedUser[]
+  subscription subscription[]
 }
 model Invoice {
   id        Int      @id @default(autoincrement())
@@ -177,10 +179,10 @@ model Bid {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
   post      Post     @relation(fields: [postId], references: [id])
-  deposits  Deposit[] // One bid can have many deposits
   winner    Winner?   // One bid can have one winner
   acceptedUser AcceptedUser? // One bid can have one accepted request
-
+  deposit   Deposit  @relation("BidDeposit", fields: [depositId], references: [id])
+  depositId Int      @unique
   @@index([userId]) // Add index on the userId field
   @@index([postId]) // Add index on the postId field
 }
@@ -233,12 +235,11 @@ model Firstpayment {
 
 model Deposit {
   id        Int      @id @default(autoincrement())
-  bidId     Int
-  userId    Int      // Deposit is made by a user
+  userId    Int      
   amount    Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  bid       Bid      @relation(fields: [bidId], references: [id])
+  bid       Bid?     @relation("BidDeposit")
   user      User     @relation(fields: [userId], references: [id])
   refunds   Refund[] 
 }
@@ -250,6 +251,7 @@ model Refund {
   updatedAt DateTime @updatedAt
   deposit      Deposit     @relation(fields: [depositId], references: [id])
 }
+
 model Winner {
   id            Int      @id @default(autoincrement())
   bidId         Int      @unique
@@ -319,7 +321,7 @@ model Rent {
   roomId    Int     @unique
   mallId    Int
   amount    Float
-  PaymentDuration   Int
+  paymentDuration   Int
   agreementFile String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -364,7 +366,17 @@ model RentInfo {
   rent        Rent     @relation(fields: [rentId], references: [id])
   businessName String
   bannerUrl    String?
-  discription  String?
+  description   String?
   workingOn    String
   createdAt    DateTime @default(now())
+}
+model subscription {
+  id          Int      @id @default(autoincrement())
+  mallId      Int
+  startDate   DateTime
+  endDate     DateTime
+  price      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  mall        Mall     @relation(fields: [mallId], references: [id])
 }

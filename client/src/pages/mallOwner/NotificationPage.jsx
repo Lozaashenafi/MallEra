@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
+import axios from "axios";
 import {
   FiBell,
   FiCheckCircle,
@@ -7,73 +7,32 @@ import {
   FiDollarSign,
   FiTag,
   FiClipboard,
+  FiMessageCircle,
+  FiAlertTriangle,
+  FiInfo,
 } from "react-icons/fi";
-import socket from "../../utils/socket";
+import { getNotifications } from "../../api/notification";
+import { useAuth } from "../../context/AuthContext";
 
-const NotificationSystem = ({ userId }) => {
+const NotificationSystem = () => {
   const [notifications, setNotifications] = useState([]);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const { userData } = useAuth();
+  const userId = userData.userId;
 
   useEffect(() => {
     if (!userId) return;
 
-    socket.connect();
-    console.log("🔌 Connecting socket...");
-
-    socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket.id);
-
-      const roomId = `user-${userId}`;
-      socket.emit("registerUser", roomId);
-      console.log(`📡 Registered as ${roomId}`);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("❌ Socket disconnected");
-    });
-
-    return () => {
-      socket.disconnect();
-      socket.off("connect");
-      socket.off("disconnect");
-    };
-  }, [userId]);
-
-  // Fetch notifications from localStorage when component is mounted
-  useEffect(() => {
-    const storedNotifications = localStorage.getItem("notifications");
-    if (storedNotifications) {
-      setNotifications(JSON.parse(storedNotifications));
-    }
-
-    if (userId) {
-      socket.emit("registerUser", userId);
-    }
-
-    const handleNewNotification = (type) => (data) => {
-      setNotifications((prev) => {
-        const newNotifications = [
-          ...prev,
-          {
-            id: data.id,
-            type: type,
-            message: data.message,
-            user: data.user,
-            read: false,
-          },
-        ];
-        localStorage.setItem("notifications", JSON.stringify(newNotifications));
-        return newNotifications;
-      });
+    const fetchNotifications = async () => {
+      try {
+        const res = await getNotifications(userId);
+        setNotifications(res);
+        localStorage.setItem("notifications", JSON.stringify(data));
+      } catch (error) {
+        console.error("❌ Failed to fetch notifications:", error);
+      }
     };
 
-    socket.on("newRequest", handleNewNotification("request"));
-    socket.on("newBid", handleNewNotification("bid"));
-
-    return () => {
-      socket.off("newRequest");
-      socket.off("newBid"); // clean this too
-    };
+    fetchNotifications();
   }, [userId]);
 
   const markAsRead = (id) => {
@@ -81,48 +40,48 @@ const NotificationSystem = ({ userId }) => {
       prev.map((notif) => {
         if (notif.id === id) {
           const updatedNotif = { ...notif, read: true };
-          // Update notifications in localStorage
           localStorage.setItem(
             "notifications",
-            JSON.stringify(
-              prev.map((notif) => (notif.id === id ? updatedNotif : notif))
-            )
+            JSON.stringify(prev.map((n) => (n.id === id ? updatedNotif : n)))
           );
           return updatedNotif;
         }
         return notif;
       })
     );
+    // Optionally: send update to backend here
   };
 
   const deleteNotification = (id) => {
     setNotifications((prev) => {
-      const updatedNotifications = prev.filter((notif) => notif.id !== id);
-      // Remove notification from localStorage
-      localStorage.setItem(
-        "notifications",
-        JSON.stringify(updatedNotifications)
-      );
-      return updatedNotifications;
+      const updated = prev.filter((notif) => notif.id !== id);
+      localStorage.setItem("notifications", JSON.stringify(updated));
+      return updated;
     });
+    // Optionally: send delete request to backend here
   };
 
   const getIcon = (type) => {
-    switch (type) {
+    switch (type.toLowerCase()) {
       case "request":
         return <FiClipboard className="text-blue-500 w-6 h-6" />;
       case "bid":
         return <FiTag className="text-purple-500 w-6 h-6" />;
       case "payment":
         return <FiDollarSign className="text-green-500 w-6 h-6" />;
+      case "message":
+        return <FiMessageCircle className="text-cyan-500 w-6 h-6" />;
+      case "alert":
+        return <FiAlertTriangle className="text-red-500 w-6 h-6" />;
+      case "system":
+        return <FiInfo className="text-gray-600 w-6 h-6" />;
       default:
         return <FiBell className="w-6 h-6" />;
     }
   };
 
-  // Prevent navigating to the notification detail page
   const handleNotificationClick = (event) => {
-    event.stopPropagation(); // Prevent click event from propagating
+    event.stopPropagation(); // Prevent navigation
   };
 
   return (
@@ -142,7 +101,7 @@ const NotificationSystem = ({ userId }) => {
               className={`flex items-center justify-between p-3 border rounded-lg ${
                 notif.read ? "bg-gray-100" : "bg-cyan-50"
               }`}
-              onClick={handleNotificationClick} // Add the click handler here
+              onClick={handleNotificationClick}
             >
               <div className="flex items-center gap-3">
                 {getIcon(notif.type)}
@@ -151,17 +110,14 @@ const NotificationSystem = ({ userId }) => {
                     notif.read ? "text-gray-500" : "text-gray-800 font-semibold"
                   }`}
                 >
-                  {notif.message} -{" "}
-                  <span className="text-sm text-gray-400">
-                    {notif.user.userName}
-                  </span>
+                  {notif.message}
                 </span>
               </div>
               <div className="flex space-x-3">
                 {!notif.read && (
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent click propagation
+                      e.stopPropagation();
                       markAsRead(notif.id);
                     }}
                     className="text-green-600 hover:text-green-800"
@@ -171,7 +127,7 @@ const NotificationSystem = ({ userId }) => {
                 )}
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent click propagation
+                    e.stopPropagation();
                     deleteNotification(notif.id);
                   }}
                   className="text-red-600 hover:text-red-800"

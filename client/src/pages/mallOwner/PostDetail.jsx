@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getPostDetail } from "../../api/post"; // Assume this fetches post data by ID
+import { getPostDetail, HidePost } from "../../api/post"; // Assume this fetches post data by ID
 const backendURL = import.meta.env.VITE_API_URL;
+import { ToastContainer, toast } from "react-toastify";
 
 function PostDetail() {
   const { id } = useParams(); // Get the post ID from URL parameters
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const handleHidePost = async () => {
+    try {
+      const res = await HidePost(id); // Call the hide post function
+      toast.success(res.message || "Post hidden successfully!");
+      setTimeout(() => {
+        navigate("/owner/posts");
+      }, 1000); // wait 1 second before redirecting
+    } catch (err) {
+      console.error("Hide post error:", err);
+      toast.error(err.response?.data?.error || "Failed to hide post.");
+    }
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -49,6 +62,7 @@ function PostDetail() {
 
   return (
     <div className="container mx-auto p-4">
+      <ToastContainer />
       <h2 className="text-2xl font-semibold mb-4">{title}</h2>
 
       {/* Image Gallery */}
@@ -85,7 +99,7 @@ function PostDetail() {
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-6">
+      <div className="mt-6 flex space-x-4">
         {bidDeposit ? (
           <Link
             to={`/owner/bid/${id}`}
@@ -101,6 +115,19 @@ function PostDetail() {
             Request
           </Link>
         )}
+        {/* Update Button */}
+        <Link
+          to={`/owner/posts/update/${id}`}
+          className="bg-yellow-500 text-white px-4 py-2 rounded"
+        >
+          Update
+        </Link>
+        <Link
+          onClick={handleHidePost}
+          className="bg-yellow-500 text-white px-4 py-2 rounded"
+        >
+          Hide Post
+        </Link>
       </div>
     </div>
   );

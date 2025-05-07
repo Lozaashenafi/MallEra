@@ -30,3 +30,24 @@ export const getPostDetail = async (userId) => {
     throw new Error(error.response?.data?.message || "Failed to fetch posts");
   }
 };
+// in api/post.js
+export const updatePost = async (formData) => {
+  try {
+    const response = await API.put("/post/update", formData);
+    console.log("Post updated successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating post:", error.response?.data || error);
+    throw error;
+  }
+};
+export const HidePost = async (postId) => {
+  try {
+    const response = await API.get(`/post/hide/${postId}`);
+    console.log("Post hidden successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error hiding post:", error.response?.data || error);
+    throw error;
+  }
+};

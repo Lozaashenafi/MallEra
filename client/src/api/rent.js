@@ -21,3 +21,14 @@ export const getRents = async (mallId) => {
     throw error;
   }
 };
+
+export const getRentByMallId = async (mallId) => {
+  try {
+    const response = await API.get(`/rent/rentinfo/${mallId}`);
+    console.log("Rents fetched successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching rents:", error.response?.data || error);
+    throw error;
+  }
+};

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { approveMall, pendingMall } from "../../api/mall";
+import { approveMall, pendingMall, deleteMall } from "../../api/mall"; // Make sure declineMall exists in your API
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -8,7 +8,7 @@ const backendURL = import.meta.env.VITE_API_URL;
 function PendingMall() {
   const [malls, setMalls] = useState([]);
 
-  const handleClick = async (mallId) => {
+  const handleApprove = async (mallId) => {
     try {
       const response = await approveMall(mallId);
       if (response.success) {
@@ -22,12 +22,35 @@ function PendingMall() {
     }
   };
 
+  const handleDecline = async (mallId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to decline this mall?"
+    );
+    if (!confirmed) return;
+    try {
+      const response = await deleteMall(mallId);
+      console.log("Response from declineMall:", response);
+      if (
+        response.status === 200 ||
+        response.status === 201 ||
+        response.success === true
+      ) {
+        setMalls((prevMalls) => prevMalls.filter((mall) => mall.id !== mallId));
+        toast.success("Mall declined successfully.");
+      } else {
+        toast.error("Failed to decline mall: " + response.message);
+      }
+    } catch (error) {
+      toast.error("Error declining mall: " + error.message);
+    }
+  };
+
   useEffect(() => {
     const fetchMalls = async () => {
       try {
         const data = await pendingMall();
         if (data.success) {
-          setMalls(data.malls);
+          setMalls(data.data); // Ensure API returns `data` array
         }
       } catch (error) {
         console.error("Error fetching malls:", error.message);
@@ -72,22 +95,30 @@ function PendingMall() {
                   />
                 ))}
               </div>
-              <a
-                href={`${backendURL}${mall.invoice[0]?.invoiceURL}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-blue-500 text-sm mt-2 underline"
-              >
-                View Invoice
-              </a>
+
+              {/* Mall Owner Info */}
+              <div className="mt-4 p-2 bg-gray-50 rounded-md text-sm border">
+                <p>
+                  <span className="font-semibold">Owner:</span>{" "}
+                  {mall.owner?.fullName?.trim() || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">Email:</span>{" "}
+                  {mall.owner?.email || "N/A"}
+                </p>
+              </div>
+
               <div className="flex justify-end space-x-2 mt-4">
                 <button
-                  onClick={() => handleClick(mall.id)}
+                  onClick={() => handleApprove(mall.id)}
                   className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl text-sm shadow"
                 >
                   Accept
                 </button>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm shadow">
+                <button
+                  onClick={() => handleDecline(mall.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm shadow"
+                >
                   Decline
                 </button>
               </div>

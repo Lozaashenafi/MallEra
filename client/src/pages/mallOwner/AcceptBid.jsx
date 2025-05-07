@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { acceptBid } from "../../api/bid"; // Make sure you have this API function
+import { acceptBid } from "../../api/bid";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

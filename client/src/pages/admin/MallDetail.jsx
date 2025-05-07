@@ -1,7 +1,8 @@
 const backendURL = import.meta.env.VITE_API_URL;
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMallById } from "../../api/mall";
+import { disableMall, getMallById } from "../../api/mall";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function MallDetail() {
   const { id } = useParams();
@@ -26,12 +27,20 @@ export default function MallDetail() {
     fetchMallDetails();
   }, [id]);
 
-  const handleDisable = () => {
-    // Implement API call to disable the mall here
-    console.log("Mall disabled", id);
-    setShowConfirm(false);
+  const handleDisable = async () => {
+    try {
+      const result = await disableMall(id);
+      if (!result.status === 200) {
+        toast("Mall disabled successfully.");
+      } else {
+        toast.error("Failed to disable the mall.");
+      }
+    } catch (error) {
+      toast("An error occurred while disabling the mall.");
+    } finally {
+      setShowConfirm(false);
+    }
   };
-
   if (loading) {
     return <p className="text-center text-gray-500">Loading mall details...</p>;
   }
@@ -42,6 +51,7 @@ export default function MallDetail() {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6 flex justify-center">
+      <ToastContainer />
       <div className="max-w-4xl w-full bg-white shadow-lg rounded-lg p-6">
         <div className="flex items-center space-x-4">
           <img

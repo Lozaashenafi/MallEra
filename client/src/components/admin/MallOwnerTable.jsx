@@ -11,7 +11,6 @@ import {
   TableSortLabel,
   TextField,
 } from "@mui/material";
-import axios from "axios"; // To make API requests
 import { getOwners } from "../../api/mall";
 
 function MallOwnerTable() {

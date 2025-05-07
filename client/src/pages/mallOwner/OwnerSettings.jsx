@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import profile from "../../assets/images/profile.jpeg";
 
 function OwnerSettings() {
   const [formData, setFormData] = useState({
@@ -11,7 +12,7 @@ function OwnerSettings() {
     notifications: true,
   });
 
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(profile);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

@@ -4,11 +4,12 @@ import { useAuth } from "../../context/AuthContext";
 import profile from "../../assets/images/profile.jpeg";
 import { FiLogOut, FiHome, FiPlusCircle, FiBell } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { useNotifications } from "../../context/NotificationContext.jsx";
 
 function OwnerHeader() {
   const { userData } = useAuth();
-  const [unreadNotifications, setUnreadNotifications] = useState(3); // Example unread count
 
+  const { unreadCount } = useNotifications();
   const handleLogout = () => {
     logout();
   };
@@ -35,9 +36,9 @@ function OwnerHeader() {
         {/* Notification Icon */}
         <Link to={"/owner/notifications"} className="relative">
           <FiBell className="text-gray-700 text-2xl hover:text-cyan-600 transition duration-300" />
-          {unreadNotifications > 0 && (
+          {unreadCount > 0 && (
             <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-              {unreadNotifications}
+              {unreadCount}
             </span>
           )}
         </Link>
